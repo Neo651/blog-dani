@@ -1,5 +1,5 @@
 site:
-  name: AstroWind
+  name: Daniel Montesinos
   site: 'https://astrowind.vercel.app'
   base: '/'
   trailingSlash: false
@@ -9,9 +9,9 @@ site:
 # Default SEO metadata
 metadata:
   title:
-    default: AstroWind
-    template: '%s — AstroWind'
-  description: "\U0001F680 Suitable for Startups, Small Business, Sass Websites, Professional Portfolios, Marketing Websites, Landing Pages & Blogs."
+    default: Daniel Montesinos
+    template: '%s — Daniel Montesinos'
+  description: "\U0001F680 🌱 Reflexiones para crecer con propósito."
   robots:
     index: true
     follow: true
