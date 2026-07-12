@@ -1,0 +1,42 @@
+---
+/*
+====================================================
+ReadingArticle
+
+Responsabilidad
+Renderizar íntegramente el desarrollo guardado en Supabase con un ritmo de lectura editorial.
+
+Qué renderiza
+Cada línea editorial no vacía como el párrafo independiente que escribió el autor.
+
+Datos que recibe
+El contenido body de una reflexión, sin resumirlo ni reescribirlo.
+
+Dependencias
+Ninguna dependencia de datos o de lógica de negocio.
+
+Qué no debe hacer
+No interpreta Markdown, no inserta HTML y no modifica el texto almacenado.
+
+Decisión de seguridad y ritmo
+Astro escapa el texto por defecto. Supabase conserva los párrafos mediante saltos de línea simples; dividir exactamente
+por esos saltos evita unir ideas que el autor decidió separar. El ritmo se controla con CSS, no alterando el contenido.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  body: string;
+}
+
+const { body } = Astro.props;
+const paragraphs = body
+  .split(/\r?\n/)
+  .map((paragraph) => paragraph.trim())
+  .filter(Boolean);
+---
+
+<div class="reading-prose mx-auto max-w-[42rem]">
+  {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+</div>

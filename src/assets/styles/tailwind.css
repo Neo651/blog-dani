@@ -1,5 +1,228 @@
 @import 'tailwindcss';
 
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Las anclas viven en los bloques de título, no en secciones con padding.
+ * 9rem = navbar (4rem) + 5rem de aire editorial. Es la única compensación aplicada:
+ * combinarla con scroll-padding-top volvería a sumar offsets y generaría el hueco que queremos evitar.
+ */
+.landing-anchor {
+  scroll-margin-top: 9rem;
+}
+
+/* Sobre mí necesita una llegada ligeramente más alta por la relación vertical entre fotografía y texto. */
+.landing-anchor-about {
+  scroll-margin-top: calc(9rem - 1.75rem);
+}
+
+/*
+ * La profundidad usa capas CSS estáticas: carbón cálido, halos ámbar y un grano casi imperceptible.
+ * No hay imágenes de fondo ni animaciones continuas que compitan con la lectura.
+ */
+.dark .landing-surface {
+  position: relative;
+  isolation: isolate;
+  background:
+    repeating-radial-gradient(circle at 0 0, rgb(255 255 255 / 1.25%) 0 0.5px, transparent 0.5px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 16%) 100%),
+    radial-gradient(circle at 12% 10%, rgb(120 53 15 / 8%), transparent 28rem),
+    radial-gradient(circle at 88% 48%, rgb(146 64 14 / 5%), transparent 34rem),
+    radial-gradient(circle at 22% 88%, rgb(87 83 78 / 6%), transparent 30rem),
+    linear-gradient(180deg, #0c0a09 0%, #12100e 42%, #0e0c0b 100%);
+}
+
+/*
+ * El Hero combina luz de ventana y cielo nocturno editorial. La base sigue fuera del componente de contenido:
+ * así el sistema visual puede evolucionar o desactivarse sin alterar el mensaje, el layout o la navegación.
+ */
+.dark .hero-atmosphere::before {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  content: '';
+  background:
+    linear-gradient(105deg, transparent 7%, rgb(245 158 11 / 3.5%) 23%, transparent 40%),
+    linear-gradient(76deg, transparent 55%, rgb(214 211 209 / 3%) 69%, transparent 82%),
+    radial-gradient(ellipse at 50% 18%, rgb(120 113 108 / 8%), transparent 54%);
+  filter: blur(0.25rem);
+}
+
+.dark .hero-atmosphere::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: '';
+  background: linear-gradient(180deg, rgb(12 10 9 / 14%), rgb(12 10 9 / 58%) 88%, rgb(12 10 9 / 88%));
+}
+
+.hero-sky-depth {
+  background:
+    radial-gradient(ellipse at 50% 5%, rgb(120 113 108 / 12%), transparent 48%),
+    radial-gradient(circle at 14% 42%, rgb(146 64 14 / 8%), transparent 31rem),
+    radial-gradient(circle at 86% 30%, rgb(68 64 60 / 9%), transparent 27rem),
+    linear-gradient(180deg, #17130f 0%, #0e0c0b 72%, #0c0a09 100%);
+}
+
+/* Dos mapas pequeños de puntos simulan profundidad sin DOM repetido, canvas ni descarga de imágenes. */
+.hero-stars {
+  background-repeat: repeat;
+  will-change: background-position, opacity;
+}
+
+.hero-stars-distant {
+  opacity: 0.24;
+  background-image:
+    radial-gradient(circle, rgb(255 251 235 / 72%) 0 0.6px, transparent 0.8px),
+    radial-gradient(circle, rgb(214 211 209 / 55%) 0 0.45px, transparent 0.7px);
+  background-position:
+    0 0,
+    53px 71px;
+  background-size:
+    137px 149px,
+    193px 211px;
+  animation: hero-stars-drift 110s linear infinite;
+}
+
+.hero-stars-near {
+  opacity: 0.18;
+  background-image:
+    radial-gradient(circle, rgb(254 243 199 / 80%) 0 0.9px, transparent 1.15px),
+    radial-gradient(circle, rgb(231 229 228 / 66%) 0 0.7px, transparent 1px);
+  background-position:
+    29px 17px,
+    117px 83px;
+  background-size:
+    263px 281px,
+    337px 313px;
+  animation: hero-stars-breathe 18s ease-in-out infinite alternate;
+}
+
+.hero-warm-horizon {
+  opacity: 0.72;
+  background:
+    radial-gradient(ellipse at 50% 84%, rgb(146 64 14 / 9%), transparent 42%),
+    linear-gradient(180deg, transparent 56%, rgb(12 10 9 / 58%) 100%);
+}
+
+@keyframes hero-stars-drift {
+  to {
+    background-position:
+      18px 12px,
+      39px 86px;
+  }
+}
+
+@keyframes hero-stars-breathe {
+  from {
+    opacity: 0.12;
+  }
+  to {
+    opacity: 0.22;
+  }
+}
+
+/* El cierre comparte el mismo carbón cálido, pero con una luz central que sugiere pausa y conclusión. */
+.dark .editorial-closing {
+  background: radial-gradient(ellipse at 50% 0%, rgb(146 64 14 / 7%), transparent 28rem), #0c0a09;
+}
+
+/*
+ * El artículo y los comentarios pertenecen a un mismo flujo emocional.
+ * La regla se limita a la Landing y ajusta únicamente composición: no invade el componente ni su lógica.
+ */
+.reading-conversation-flow > [data-comments-root] {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+/*
+ * La columna de lectura se mantiene cerca de 65 caracteres con una escala que no obliga a ampliar en móvil.
+ * Los márgenes pertenecen a los párrafos reales; los saltos simples internos conservan su intención sin crear tarjetas.
+ */
+.reading-prose {
+  color: rgb(68 64 60);
+  font-size: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
+  line-height: 1.85;
+  letter-spacing: -0.008em;
+}
+
+.reading-prose p + p {
+  margin-top: 1.15em;
+}
+
+.dark .reading-prose {
+  color: rgb(214 211 209);
+}
+
+@media (min-width: 640px) {
+  .reading-conversation-flow > [data-comments-root] {
+    margin-top: 2rem;
+    padding-top: 2rem;
+  }
+}
+
+.landing-reveal {
+  animation: landing-reveal 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing-reveal-delay-1 {
+  animation-delay: 80ms;
+}
+
+.landing-reveal-delay-2 {
+  animation-delay: 160ms;
+}
+
+.landing-reveal-delay-3 {
+  animation-delay: 240ms;
+}
+
+.landing-reveal-delay-4 {
+  animation-delay: 320ms;
+}
+
+@supports (animation-timeline: view()) {
+  .landing-section-reveal {
+    animation: landing-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 22%;
+  }
+}
+
+@keyframes landing-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .landing-reveal {
+    animation: none;
+  }
+
+  .landing-section-reveal {
+    animation: none;
+  }
+
+  /* El cielo conserva profundidad estática sin imponer movimiento a quien decidió reducirlo. */
+  .hero-stars {
+    animation: none;
+    will-change: auto;
+  }
+}
+
 @plugin "@tailwindcss/typography";
 
 @variant dark (&:where(.dark, .dark *));
@@ -19,12 +242,12 @@
   --font-serif: 'var(--aw-font-serif, ui-serif)', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-heading: 'var(--aw-font-heading, ui-sans-serif)', ui-sans-serif, system-ui, sans-serif;
 
-  --animate-fade: fadeInUp 1s both;
+  --animate-fade: fadeInUp 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes fadeInUp {
     0% {
       opacity: 0;
-      transform: translateY(2rem);
+      transform: translateY(0.75rem);
     }
     100% {
       opacity: 1;

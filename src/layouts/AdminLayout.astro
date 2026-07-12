@@ -1,0 +1,19 @@
+---
+import Layout from '~/layouts/Layout.astro';
+import { siteConfig } from '~/config/site';
+import type { MetaData } from '~/types';
+export interface Props {
+  metadata?: MetaData;
+}
+const { metadata } = Astro.props;
+---
+
+<Layout metadata={metadata}>
+  <header class="border-b border-gray-200 dark:border-gray-800">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+      <a href="/" class="font-bold">{siteConfig.brand.name}</a>
+      <a href="/" class="text-sm text-gray-500">Ver sitio</a>
+    </div>
+  </header>
+  <main><slot /></main>
+</Layout>

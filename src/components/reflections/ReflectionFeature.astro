@@ -1,0 +1,88 @@
+---
+/*
+====================================================
+ReflectionFeature
+
+Responsabilidad
+Presentar la reflexión principal como una experiencia editorial completa y legible.
+
+Por qué existe
+Une portada, contenido y reacción en una sola pieza para preservar el arco emocional de la lectura.
+
+Decisión de experiencia
+La reacción queda cerca del último párrafo: debe sentirse como la primera respuesta del lector, no como otra sección.
+
+Qué no hace
+No consulta datos, no modifica el contenido editorial y no gestiona la conversación posterior.
+
+Dependencias
+LikeButton, tipo Reflection, configuración pública y utilidad de fecha.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import LikeButton from '~/components/social/LikeButton.astro';
+import type { SiteConfig } from '~/config/site';
+import type { Reflection } from '~/features/reflections/types';
+import { formatReflectionDate } from '~/utils/reflections';
+
+export interface Props {
+  reflection: Reflection;
+  brand: SiteConfig['brand'];
+  headingLevel?: 'h1' | 'h2';
+}
+
+const { reflection, brand, headingLevel = 'h1' } = Astro.props;
+const Heading = headingLevel;
+const paragraphs = reflection.body
+  .split(/\n\s*\n|\n/)
+  .map((value) => value.trim())
+  .filter(Boolean);
+---
+
+<article
+  class="overflow-hidden rounded-[2rem] border border-stone-200 bg-white shadow-[0_30px_90px_-55px_rgba(28,25,23,0.5)] dark:border-stone-800 dark:bg-stone-900"
+>
+  <div class="relative min-h-[520px] overflow-hidden sm:min-h-[620px]">
+    <img
+      src={reflection.image_url}
+      alt={reflection.title}
+      fetchpriority="high"
+      decoding="async"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/45 to-stone-950/20"></div>
+    <div class="relative flex min-h-[520px] flex-col justify-between p-7 text-white sm:min-h-[620px] sm:p-12 lg:p-16">
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/75">{brand.name}</p>
+      <div class="max-w-4xl">
+        <p class="text-sm font-medium text-white/75">{formatReflectionDate(reflection.published_at)}</p>
+        <blockquote
+          class="mt-6 text-balance text-3xl font-semibold leading-tight tracking-[-0.025em] sm:text-5xl sm:leading-[1.08]"
+        >
+          “{reflection.quote}”
+        </blockquote>
+        {reflection.quote_author && <p class="mt-6 text-lg text-white/85">— {reflection.quote_author}</p>}
+      </div>
+      <p class="text-base font-medium text-white/85">{brand.tagline}</p>
+    </div>
+  </div>
+  <div class="px-7 pb-8 pt-10 sm:px-12 sm:pb-10 sm:pt-14 lg:px-16 lg:pb-10 lg:pt-16">
+    <div class="mx-auto max-w-3xl">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400">
+        Reflexión · {reflection.reading_minutes || 3} min de lectura
+      </p>
+      <Heading
+        class="mt-5 text-balance text-4xl font-semibold tracking-[-0.035em] text-stone-950 dark:text-stone-50 sm:text-5xl"
+        >{reflection.title}</Heading
+      >
+      <div class="mt-8 space-y-6 text-lg leading-8 text-stone-700 dark:text-stone-300 sm:text-xl sm:leading-9">
+        {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+      <!-- La línea funciona como una pausa breve, no como una ruptura entre lectura y respuesta. -->
+      <div class="mt-6 border-t border-stone-200 pt-5 dark:border-stone-800 sm:mt-7 sm:pt-6">
+        <LikeButton reflectionId={reflection.id} />
+      </div>
+    </div>
+  </div>
+</article>

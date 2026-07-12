@@ -1,0 +1,139 @@
+---
+/*
+====================================================
+Página individual de reflexión
+
+Responsabilidad
+Orquestar en SSR la experiencia completa de lectura a partir de una reflexión publicada y real.
+
+Qué renderiza
+Navegación discreta, cabecera editorial, cuerpo íntegro, acciones, conversación y reflexiones relacionadas.
+
+Datos que recibe
+El slug de la ruta. Obtiene contenido y recomendaciones exclusivamente mediante servicios centralizados.
+
+Dependencias
+Servicios de reflexiones, componentes de lectura, configuración pública, layout y utilidades editoriales.
+
+Qué no debe hacer
+No accede directamente a Supabase, no altera contenido, no muestra borradores y no modifica la Landing.
+
+Decisión de datos
+La reflexión se resuelve primero para garantizar un 404 real. Solo después se solicitan relacionadas excluyendo su id;
+esto evita consultas inútiles para slugs inexistentes y mantiene una estrategia provisional de recencia documentada.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import { siteConfig } from '~/config/site';
+import { getPublishedReflectionBySlug, getRelatedReflections } from '~/features/reflections/service';
+import CommentsSection from '~/components/comments/CommentsSection.astro';
+import ReadingActions from '~/components/reflections/ReadingActions.astro';
+import ReadingArticle from '~/components/reflections/ReadingArticle.astro';
+import ReadingHeader from '~/components/reflections/ReadingHeader.astro';
+import ReadingNavigation from '~/components/reflections/ReadingNavigation.astro';
+import RelatedReflections from '~/components/reflections/RelatedReflections.astro';
+import Layout from '~/layouts/PageLayout.astro';
+import { getCanonical } from '~/utils/permalinks';
+import { calculateReadingMinutes, getReflectionExcerpt } from '~/utils/reflections';
+import type { Reflection } from '~/features/reflections/types';
+
+const { slug = '' } = Astro.params;
+let reflection: Reflection | null = null;
+let reflectionLoadFailed = false;
+
+try {
+  reflection = await getPublishedReflectionBySlug(slug);
+} catch (error) {
+  console.error('No se pudo cargar la reflexión', error);
+  reflectionLoadFailed = true;
+}
+
+// Una caída temporal de datos no debe convertirse en un 404 indexable ni comunicar que el contenido dejó de existir.
+if (reflectionLoadFailed) {
+  return new Response('No pudimos cargar esta reflexión. Inténtalo de nuevo en unos minutos.', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Robots-Tag': 'noindex', 'Retry-After': '120' },
+  });
+}
+
+if (!reflection) {
+  return new Response('Reflexión no encontrada', {
+    status: 404,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Robots-Tag': 'noindex' },
+  });
+}
+
+let relatedReflections: Reflection[] = [];
+try {
+  relatedReflections = await getRelatedReflections(reflection.id, 3);
+} catch (error) {
+  // Las recomendaciones enriquecen el final, pero nunca deben impedir que el contenido principal pueda leerse.
+  console.warn('No se pudieron cargar las reflexiones relacionadas', error);
+}
+
+const canonical = String(getCanonical(`/reflexiones/${reflection.slug}`));
+const description = getReflectionExcerpt(reflection.body, 160);
+const readingMinutes = calculateReadingMinutes(reflection.body);
+const metadata = {
+  title: reflection.title,
+  description,
+  canonical,
+  openGraph: {
+    type: 'article',
+    images: [{ url: reflection.image_url, width: 1600, height: 900 }],
+  },
+  twitter: {
+    cardType: 'summary_large_image',
+  },
+};
+const articleStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: reflection.title,
+  description,
+  image: [reflection.image_url],
+  datePublished: reflection.published_at,
+  author: {
+    '@type': 'Person',
+    name: siteConfig.brand.name,
+    url: `${siteConfig.brand.siteUrl}/#sobre-daniel`,
+  },
+  mainEntityOfPage: canonical,
+};
+// JSON-LD necesita HTML inline; escapar '<' impide que contenido editorial pueda cerrar la etiqueta script.
+const articleStructuredDataJson = JSON.stringify(articleStructuredData).replace(/</g, '\\u003c');
+---
+
+<Layout metadata={metadata}>
+  <script type="application/ld+json" is:inline set:html={articleStructuredDataJson} />
+
+  <div class="reading-experience">
+    <div class="mx-auto max-w-5xl px-5 pb-12 pt-8 sm:px-6 sm:pb-16 sm:pt-10">
+      <ReadingNavigation />
+      <article class="reading-story">
+        <ReadingHeader reflection={reflection} authorName={siteConfig.brand.name} readingMinutes={readingMinutes} />
+
+        <!-- Cabecera y desarrollo comparten el mismo article semántico y una transición corta, no dos módulos. -->
+        <div class="pt-8 sm:pt-10">
+          <ReadingArticle body={reflection.body} />
+        </div>
+
+        <!-- El espacio se reduce progresivamente para mantener viva la emoción entre lectura y reacción. -->
+        <div class="mt-7 sm:mt-8">
+          <ReadingActions
+            reflectionId={reflection.id}
+            canonicalUrl={canonical}
+            title={reflection.title}
+            description={description}
+          />
+        </div>
+      </article>
+
+      <CommentsSection reflectionId={reflection.id} returnTo={`/reflexiones/${reflection.slug}`} mode="reading" />
+    </div>
+
+    <RelatedReflections reflections={relatedReflections} />
+  </div>
+</Layout>

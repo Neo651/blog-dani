@@ -1,0 +1,53 @@
+---
+/*
+====================================================
+SiteFooter
+
+Responsabilidad
+Cerrar el recorrido de lectura con un mensaje humano y sereno.
+
+Qué hace
+Presenta el cierre emocional, la firma y los derechos del sitio.
+
+Qué no hace
+No duplica la navegación ni contiene lógica de negocio.
+
+Dependencias
+Configuración pública tipada del sitio.
+
+Decisión de diseño
+El cierre usa una escala contenida para devolver el protagonismo a la idea leída y terminar con una pausa, no con otro llamado.
+
+Cómo extenderlo
+Puede incorporar enlaces legales secundarios, pero no debe duplicar las redes ni convertirse en un mapa completo del sitio.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import type { SiteConfig } from '~/config/site';
+
+export interface Props {
+  brand: SiteConfig['brand'];
+  footer: SiteConfig['footer'];
+}
+
+const { brand, footer } = Astro.props;
+---
+
+<footer
+  id="footer"
+  class="editorial-closing border-t border-stone-200 px-6 py-12 text-center dark:border-white/[0.07] sm:py-14"
+>
+  <div class="mx-auto max-w-2xl">
+    <span aria-hidden="true" class="text-base text-amber-700/60 dark:text-amber-400/50">✦</span>
+    <p class="mt-4 text-xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-2xl">
+      {footer.title}
+    </p>
+    <p class="mt-4 text-pretty text-sm leading-6 text-stone-600 dark:text-stone-400 sm:text-base sm:leading-7">
+      {footer.message}
+    </p>
+    <p class="mt-4 text-sm font-medium text-stone-800 dark:text-stone-300">{footer.signature}</p>
+    <p class="mt-8 text-xs text-stone-400">© {new Date().getFullYear()} {brand.name}</p>
+  </div>
+</footer>

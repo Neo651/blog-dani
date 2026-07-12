@@ -1,0 +1,38 @@
+---
+/*
+====================================================
+HeroBackground
+
+Responsabilidad
+Definir el límite visual y técnico del fondo de marca del Hero.
+
+Por qué existe
+El futuro Fondo Vivo necesitará evolucionar de forma independiente al contenido, la navegación y la jerarquía del Hero.
+Este componente evita que esa implementación obligue a refactorizar HeroSection o mezcle animación con contenido editorial.
+
+Qué resuelve ahora
+Construye un cielo nocturno editorial con profundidad, estrellas discretas y una respiración lumínica muy lenta.
+Todo se genera con CSS para evitar imágenes decorativas, JavaScript y trabajo continuo costoso.
+
+Decisiones de diseño
+Las estrellas se dividen en dos planos con opacidades y velocidades distintas para sugerir distancia sin parecer un efecto tecnológico.
+El movimiento solo modifica fondos y opacidad, y desaparece por completo cuando el usuario prefiere movimiento reducido.
+
+Qué no implementa todavía
+No incluye parallax, canvas, interacción con puntero ni estrellas fugaces. Una estrella episódica requiere validar frecuencia,
+visibilidad y distracción como una mejora independiente antes de incorporarla.
+
+Punto de extensión
+data-live-background-slot identifica el único contenedor donde se incorporará el futuro Feature de Fondo Vivo.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+---
+
+<div data-live-background-slot class="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+  <div class="hero-sky-depth absolute inset-0"></div>
+  <div class="hero-stars hero-stars-distant absolute inset-0"></div>
+  <div class="hero-stars hero-stars-near absolute inset-0"></div>
+  <div class="hero-warm-horizon absolute inset-0"></div>
+</div>

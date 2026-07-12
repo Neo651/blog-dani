@@ -1,0 +1,322 @@
+<div data-admin-root class="mx-auto max-w-6xl px-6 py-12">
+  <section data-login class="mx-auto max-w-md rounded-3xl border border-gray-200 p-8 dark:border-gray-800">
+    <h1 class="text-3xl font-bold">Administración</h1>
+    <p class="mt-2 text-gray-500">Inicia sesión con tu cuenta administradora.</p>
+    <form data-login-form class="mt-6 space-y-4">
+      <input
+        data-email
+        type="email"
+        required
+        autocomplete="email"
+        placeholder="Correo"
+        class="w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+      />
+      <input
+        data-password
+        type="password"
+        required
+        autocomplete="current-password"
+        placeholder="Contraseña"
+        class="w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+      />
+      <button class="w-full rounded-full bg-gray-950 px-5 py-3 font-semibold text-white dark:bg-white dark:text-black"
+        >Entrar</button
+      >
+    </form>
+  </section>
+
+  <section data-panel class="hidden">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="text-sm uppercase tracking-widest text-gray-500">Panel privado</p><h1 class="mt-2 text-4xl font-bold">
+          Reflexiones
+        </h1>
+      </div>
+      <div class="flex gap-3">
+        <button
+          data-new
+          class="rounded-full bg-gray-950 px-5 py-3 font-semibold text-white dark:bg-white dark:text-black"
+          >Nueva reflexión</button
+        ><button data-logout class="rounded-full border border-gray-300 px-5 py-3">Salir</button>
+      </div>
+    </div>
+    <div data-stats class="mt-8 grid gap-4 sm:grid-cols-3"></div>
+    <div data-list class="mt-8 space-y-4"></div>
+  </section>
+
+  <section data-editor class="hidden">
+    <button data-cancel type="button" class="mb-6 text-sm font-semibold">← Volver al listado</button>
+    <h1 data-editor-title class="text-4xl font-bold">Nueva reflexión</h1>
+    <form data-editor-form class="mt-8 grid gap-6 rounded-3xl border border-gray-200 p-8 dark:border-gray-800">
+      <input data-id type="hidden" />
+      <label
+        >Título<input
+          data-title
+          required
+          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+        /></label
+      >
+      <label
+        >Slug<input
+          data-slug
+          required
+          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+        /></label
+      >
+      <label
+        >Fecha de publicación<input
+          data-date
+          type="datetime-local"
+          required
+          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+        /></label
+      >
+      <label
+        >Imagen<input
+          data-image
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          class="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700"
+        /></label
+      >
+      <label
+        >Frase<textarea
+          data-quote
+          required
+          rows="3"
+          class="mt-2 w-full rounded-xl border border-gray-300 p-4 dark:border-gray-700 dark:bg-gray-900"
+        ></textarea></label
+      >
+      <label
+        >Autor de la frase<input
+          data-author
+          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
+        /></label
+      >
+      <label
+        >Desarrollo<textarea
+          data-body
+          required
+          rows="14"
+          class="mt-2 w-full rounded-xl border border-gray-300 p-4 dark:border-gray-700 dark:bg-gray-900"
+        ></textarea></label
+      >
+      <label class="flex items-center gap-3"><input data-published type="checkbox" /> Publicar ahora</label>
+      <button
+        data-save
+        class="rounded-full bg-gray-950 px-6 py-4 font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        >Guardar reflexión</button
+      >
+    </form>
+  </section>
+  <p data-message class="mx-auto mt-6 hidden max-w-3xl rounded-xl p-4 text-center"></p>
+</div>
+
+<script>
+  import { getCurrentUser, signInWithPassword, signOut } from '~/features/auth/service';
+  import {
+    createReflection,
+    createSlug,
+    deleteReflection,
+    getAdminReflections,
+    imagePathFromUrl,
+    removeReflectionImage,
+    updateReflection,
+    uploadReflectionImage,
+  } from '~/features/reflections/service';
+  import type { Reflection, ReflectionInput } from '~/features/reflections/types';
+
+  const root = document.querySelector('[data-admin-root]');
+  if (root instanceof HTMLElement) {
+    const select = <T extends Element>(name: string) => root.querySelector<T>(`[data-${name}]`);
+    const login = select<HTMLElement>('login');
+    const panel = select<HTMLElement>('panel');
+    const editor = select<HTMLElement>('editor');
+    const list = select<HTMLElement>('list');
+    const stats = select<HTMLElement>('stats');
+    const message = select<HTMLElement>('message');
+    const form = select<HTMLFormElement>('editor-form');
+    let records: Reflection[] = [];
+    let editing: Reflection | null = null;
+
+    const notify = (text: string, isError = false) => {
+      if (!message) return;
+      message.textContent = text;
+      message.className = `mx-auto mt-6 max-w-3xl rounded-xl p-4 text-center ${isError ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`;
+    };
+    const show = (section: 'login' | 'panel' | 'editor') => {
+      login?.classList.toggle('hidden', section !== 'login');
+      panel?.classList.toggle('hidden', section !== 'panel');
+      editor?.classList.toggle('hidden', section !== 'editor');
+    };
+    const value = (name: string) => select<HTMLInputElement | HTMLTextAreaElement>(name)?.value.trim() ?? '';
+
+    const render = () => {
+      if (stats) {
+        const published = records.filter((record) => record.is_published).length;
+        stats.innerHTML = '';
+        [
+          ['Total', records.length],
+          ['Publicadas', published],
+          ['Borradores', records.length - published],
+        ].forEach(([label, amount]) => {
+          const card = document.createElement('div');
+          card.className = 'rounded-2xl border border-gray-200 p-5 dark:border-gray-800';
+          const number = document.createElement('p');
+          number.className = 'text-3xl font-bold';
+          number.textContent = String(amount);
+          const text = document.createElement('p');
+          text.className = 'text-gray-500';
+          text.textContent = String(label);
+          card.append(number, text);
+          stats.append(card);
+        });
+      }
+      if (!list) return;
+      list.replaceChildren();
+      records.forEach((record) => {
+        const article = document.createElement('article');
+        article.className =
+          'flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 p-5 dark:border-gray-800';
+        const info = document.createElement('div');
+        const title = document.createElement('h2');
+        title.className = 'text-xl font-bold';
+        title.textContent = record.title;
+        const status = document.createElement('p');
+        status.className = 'mt-1 text-sm text-gray-500';
+        status.textContent = record.is_published ? 'Publicada' : 'Borrador';
+        info.append(title, status);
+        const actions = document.createElement('div');
+        actions.className = 'flex gap-3';
+        const edit = document.createElement('button');
+        edit.textContent = 'Editar';
+        edit.className = 'rounded-full border px-4 py-2';
+        edit.addEventListener('click', () => openEditor(record));
+        const remove = document.createElement('button');
+        remove.textContent = 'Eliminar';
+        remove.className = 'rounded-full border border-red-300 px-4 py-2 text-red-700';
+        remove.addEventListener('click', () => removeRecord(record));
+        actions.append(edit, remove);
+        article.append(info, actions);
+        list.append(article);
+      });
+    };
+    const refresh = async () => {
+      records = await getAdminReflections();
+      render();
+    };
+    const setField = (name: string, value: string) => {
+      const element = select<HTMLInputElement | HTMLTextAreaElement>(name);
+      if (element) element.value = value;
+    };
+    const openEditor = (record: Reflection | null = null) => {
+      editing = record;
+      form?.reset();
+      setField('id', record ? String(record.id) : '');
+      setField('title', record?.title ?? '');
+      setField('slug', record?.slug ?? '');
+      setField(
+        'date',
+        record ? new Date(record.published_at).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16)
+      );
+      setField('quote', record?.quote ?? '');
+      setField('author', record?.quote_author ?? '');
+      setField('body', record?.body ?? '');
+      const published = select<HTMLInputElement>('published');
+      if (published) published.checked = record?.is_published ?? false;
+      const heading = select<HTMLElement>('editor-title');
+      if (heading) heading.textContent = record ? 'Editar reflexión' : 'Nueva reflexión';
+      show('editor');
+    };
+    const removeRecord = async (record: Reflection) => {
+      if (!confirm(`¿Eliminar “${record.title}”? Esta acción no se puede deshacer.`)) return;
+      try {
+        await deleteReflection(record.id);
+        const path = imagePathFromUrl(record.image_url);
+        if (path) await removeReflectionImage(path).catch(() => undefined);
+        await refresh();
+        notify('Reflexión eliminada.');
+      } catch (error) {
+        notify(error instanceof Error ? error.message : 'No se pudo eliminar.', true);
+      }
+    };
+
+    select<HTMLFormElement>('login-form')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      try {
+        const user = await signInWithPassword(value('email'), value('password'));
+        if (import.meta.env.PUBLIC_ADMIN_EMAIL && user?.email !== import.meta.env.PUBLIC_ADMIN_EMAIL) {
+          await signOut();
+          throw new Error('Esta cuenta no está habilitada para administrar.');
+        }
+        await refresh();
+        show('panel');
+      } catch (error) {
+        notify(error instanceof Error ? error.message : 'No se pudo iniciar sesión.', true);
+      }
+    });
+    select<HTMLButtonElement>('logout')?.addEventListener('click', async () => {
+      await signOut();
+      show('login');
+    });
+    select<HTMLButtonElement>('new')?.addEventListener('click', () => openEditor());
+    select<HTMLButtonElement>('cancel')?.addEventListener('click', () => show('panel'));
+    select<HTMLInputElement>('title')?.addEventListener('input', () => {
+      if (!editing) setField('slug', createSlug(value('title')));
+    });
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const save = select<HTMLButtonElement>('save');
+      if (save) save.disabled = true;
+      const image = select<HTMLInputElement>('image')?.files?.[0];
+      let uploaded: { url: string; path: string } | null = null;
+      try {
+        if (!editing && !image) throw new Error('Selecciona una imagen.');
+        if (image) uploaded = await uploadReflectionImage(image);
+        const body = value('body');
+        const payload: ReflectionInput = {
+          slug: value('slug'),
+          title: value('title'),
+          body,
+          quote: value('quote'),
+          quote_author: value('author') || null,
+          image_url: uploaded?.url ?? editing?.image_url ?? '',
+          published_at: new Date(value('date')).toISOString(),
+          reading_minutes: Math.max(1, Math.ceil(body.split(/\s+/).length / 220)),
+          is_published: select<HTMLInputElement>('published')?.checked ?? false,
+        };
+        if (editing) await updateReflection(editing.id, payload);
+        else await createReflection(payload);
+        if (uploaded && editing) {
+          const oldPath = imagePathFromUrl(editing.image_url);
+          if (oldPath) await removeReflectionImage(oldPath).catch(() => undefined);
+        }
+        await refresh();
+        show('panel');
+        notify(editing ? 'Reflexión actualizada.' : 'Reflexión creada.');
+      } catch (error) {
+        if (uploaded) await removeReflectionImage(uploaded.path).catch(() => undefined);
+        notify(error instanceof Error ? error.message : 'No se pudo guardar.', true);
+      } finally {
+        if (save) save.disabled = false;
+      }
+    });
+
+    getCurrentUser()
+      .then(async (user) => {
+        const allowedByVisualCheck =
+          !import.meta.env.PUBLIC_ADMIN_EMAIL || user?.email === import.meta.env.PUBLIC_ADMIN_EMAIL;
+        if (user && !user.is_anonymous && allowedByVisualCheck) {
+          try {
+            await refresh();
+            show('panel');
+          } catch {
+            await signOut();
+            show('login');
+          }
+        } else show('login');
+      })
+      .catch(() => show('login'));
+  }
+</script>

@@ -1,0 +1,64 @@
+---
+/*
+====================================================
+RelatedReflections
+
+Responsabilidad
+Ofrecer una continuación editorial al finalizar la conversación.
+
+Qué renderiza
+Hasta tres previews reales y publicadas, excluyendo la reflexión actual desde el servicio.
+
+Datos que recibe
+Una lista ya seleccionada de Reflection; el componente no decide relevancia ni consulta datos.
+
+Dependencias
+ReflectionCard y tipo Reflection.
+
+Qué no debe hacer
+No inventa contenido, no muestra una caja vacía, no simula recomendaciones inteligentes y no amplifica una única tarjeta.
+
+Estrategia provisional
+Mientras no existan categorías o etiquetas, el servicio entrega las publicaciones recientes distintas a la actual.
+Cuando exista relación temática real, solo cambiará esa selección y este componente permanecerá estable.
+Con menos de dos resultados la sección se omite: una sola tarjeta genera más peso visual que continuidad editorial.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import ReflectionCard from '~/components/reflections/ReflectionCard.astro';
+import type { Reflection } from '~/features/reflections/types';
+
+export interface Props {
+  reflections: Reflection[];
+}
+
+const { reflections } = Astro.props;
+---
+
+{
+  reflections.length >= 2 && (
+    <section
+      aria-labelledby="related-reflections-title"
+      class="border-t border-stone-200/80 py-16 dark:border-white/[0.07] sm:py-20"
+    >
+      <div class="mx-auto max-w-6xl px-5 sm:px-6">
+        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 dark:text-stone-400">
+          Para continuar
+        </p>
+        <h2
+          id="related-reflections-title"
+          class="mt-3 max-w-2xl text-balance text-3xl font-semibold tracking-[-0.03em] text-stone-950 dark:text-stone-50 sm:text-4xl"
+        >
+          Quizá esta reflexión también sea para ti.
+        </h2>
+        <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {reflections.map((reflection) => (
+            <ReflectionCard reflection={reflection} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

@@ -1,0 +1,338 @@
+# Feature 10 — Motion Design System
+
+Status: Planned
+
+---
+
+# Objetivo
+
+Crear un sistema consistente de movimiento para todo el sitio.
+
+Las animaciones no existen para llamar la atención.
+
+Existen para:
+
+- dirigir la mirada
+- reforzar la jerarquía visual
+- dar sensación de calidad
+- transmitir calma
+- hacer que la navegación se sienta natural
+
+El usuario nunca debería pensar:
+
+"Qué bonita animación."
+
+Debería pensar:
+
+"Qué agradable se siente este sitio."
+
+---
+
+# Principios
+
+El movimiento debe ser:
+
+- elegante
+- lento
+- natural
+- sutil
+- editorial
+
+Nunca debe sentirse:
+
+- gamer
+- flashy
+- exagerado
+- infantil
+- distractor
+
+Cada animación debe tener un propósito.
+
+---
+
+# Filosofía
+
+Inspiración:
+
+- Apple
+- Linear
+- Notion
+- Stripe
+- Vercel
+- Medium
+
+No buscamos sorprender.
+
+Buscamos transmitir serenidad.
+
+---
+
+# Hero
+
+El Hero debe sentirse vivo.
+
+No estático.
+
+Permitido:
+
+- gradientes respirando lentamente
+- estrellas muy suaves
+- partículas discretas
+- ligero movimiento del fondo
+- cometa ocasional
+- iluminación ambiental
+
+Todo debe ocurrir lentamente.
+
+Sin distraer del contenido.
+
+---
+
+# Scroll Reveal
+
+Los bloques aparecerán conforme el usuario lee.
+
+No deben simplemente aparecer.
+
+Animación:
+
+- Fade
+- Translate Y muy pequeño
+- Opacity
+
+Duración:
+
+300–500 ms
+
+Stagger únicamente cuando existan varias tarjetas.
+
+---
+
+# Hover
+
+Todos los elementos interactivos deben responder.
+
+Ejemplos:
+
+Cards
+
+Botones
+
+Links
+
+Redes
+
+Acciones
+
+La respuesta debe ser:
+
+- elevación mínima
+- sombra ligera
+- cambio sutil de color
+- transición suave
+
+Nunca:
+
+rebotes
+
+zoom exagerado
+
+rotaciones
+
+---
+
+# Botones
+
+Estados:
+
+Normal
+
+Hover
+
+Active
+
+Focus
+
+Disabled
+
+Las transiciones deben ser consistentes en todo el sitio.
+
+---
+
+# Cards
+
+Las tarjetas deben sentirse físicas.
+
+Hover:
+
+- ligera elevación
+- sombra suave
+- borde ligeramente iluminado
+
+Nunca cambiar radicalmente.
+
+---
+
+# Navegación
+
+La navegación debe sentirse fluida.
+
+Permitido:
+
+- underline animado
+- color progresivo
+- transición entre páginas
+- estado activo elegante
+
+No usar efectos llamativos.
+
+---
+
+# Imágenes
+
+Las imágenes nunca deben hacer zoom automáticamente.
+
+Permitido:
+
+- fade
+- reveal
+- lazy loading elegante
+
+No:
+
+zoom continuo
+
+parallax agresivo
+
+movimientos bruscos
+
+---
+
+# Fondo
+
+El fondo puede tener movimiento extremadamente sutil.
+
+Ejemplos:
+
+- estrellas
+- partículas
+- ruido cinematográfico
+- gradiente vivo
+- cometa ocasional
+
+La velocidad debe ser muy baja.
+
+Debe transmitir calma.
+
+No entretenimiento.
+
+---
+
+# Ritmo
+
+No todas las cosas deben moverse.
+
+Debe existir contraste.
+
+Si todo se mueve, nada destaca.
+
+Solo deben animarse los elementos importantes.
+
+---
+
+# Timing
+
+Utilizar un único sistema de tiempos.
+
+Ejemplo:
+
+150 ms
+
+250 ms
+
+350 ms
+
+500 ms
+
+700 ms
+
+Evitar tiempos arbitrarios.
+
+---
+
+# Easing
+
+Usar curvas naturales.
+
+No lineales.
+
+Preferir ease-out y ease-in-out.
+
+Todo el sitio debe compartir el mismo lenguaje de movimiento.
+
+---
+
+# Performance
+
+Toda animación debe ejecutarse mediante:
+
+- transform
+- opacity
+
+Evitar:
+
+top
+
+left
+
+width
+
+height
+
+margin
+
+Animar únicamente propiedades aceleradas por GPU.
+
+Mantener 60 FPS.
+
+---
+
+# Accesibilidad
+
+Respetar siempre:
+
+prefers-reduced-motion
+
+Cuando el usuario reduzca animaciones:
+
+- eliminar movimientos
+- mantener únicamente fades suaves
+
+---
+
+# Criterios de aceptación
+
+El movimiento nunca debe distraer de la lectura.
+
+Debe hacer que el sitio se perciba más premium.
+
+Debe sentirse coherente en todas las páginas.
+
+Un visitante debería notar que el sitio "se siente diferente" sin poder explicar exactamente por qué.
+
+---
+
+# Fuera de alcance
+
+No agregar:
+
+- animaciones 3D
+- efectos de partículas intensos
+- fondos interactivos
+- Lottie innecesarios
+- efectos de videojuegos
+- loaders complejos
+
+El movimiento debe servir al contenido.
+
+Nunca competir con él.

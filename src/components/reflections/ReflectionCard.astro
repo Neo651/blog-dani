@@ -1,0 +1,82 @@
+---
+/*
+====================================================
+ReflectionCard
+
+Responsabilidad
+Presentar una reflexión reciente como preview editorial.
+
+Qué hace
+Muestra imagen, fecha, lectura, título, frase, métricas opcionales y acceso al contenido.
+
+Qué no hace
+No consulta Supabase ni administra likes o comentarios.
+
+Dependencias
+Tipo Reflection y utilidades de presentación.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import type { Reflection } from '~/features/reflections/types';
+import { formatReflectionDate } from '~/utils/reflections';
+
+export interface Props {
+  reflection: Reflection;
+  likeCount?: number;
+  commentCount?: number;
+}
+
+const { reflection, likeCount, commentCount } = Astro.props;
+const href = `/reflexiones/${reflection.slug}`;
+---
+
+<article
+  class="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white transition duration-500 hover:-translate-y-1.5 hover:border-stone-300 hover:shadow-[0_28px_70px_-40px_rgba(28,25,23,0.5)] dark:border-stone-800 dark:bg-stone-900 dark:hover:border-stone-700"
+>
+  <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-stone-100 dark:bg-stone-800">
+    <img
+      src={reflection.image_url}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+    />
+  </a>
+  <div class="flex flex-1 flex-col p-6 sm:p-7">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-stone-500 dark:text-stone-400">
+      <time datetime={reflection.published_at}>{formatReflectionDate(reflection.published_at)}</time><span
+        aria-hidden="true">·</span
+      ><span>{reflection.reading_minutes || 3} min de lectura</span>
+    </div>
+    <h3
+      class="mt-4 text-balance text-2xl font-semibold leading-tight tracking-[-0.025em] text-stone-950 dark:text-stone-50"
+    >
+      <a
+        href={href}
+        class="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
+        >{reflection.title}</a
+      >
+    </h3>
+    <blockquote
+      class="mt-4 border-l-2 border-amber-300 pl-4 text-sm italic leading-6 text-stone-600 dark:border-amber-700 dark:text-stone-300"
+    >
+      “{reflection.quote}”
+    </blockquote>
+    {
+      (likeCount !== undefined || commentCount !== undefined) && (
+        <p class="mt-5 flex flex-wrap gap-4 text-xs text-stone-500 dark:text-stone-400">
+          {likeCount !== undefined && <span>♥ {likeCount} conexiones</span>}
+          {commentCount !== undefined && <span>◌ {commentCount} comentarios</span>}
+        </p>
+      )
+    }
+    <a
+      href={href}
+      class="mt-6 inline-flex min-h-11 w-fit items-center border-b border-stone-300 py-2 text-sm font-semibold text-stone-900 transition duration-300 hover:border-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-100"
+    >
+      Leer reflexión<span aria-hidden="true" class="ml-2 transition duration-300 group-hover:translate-x-1">→</span>
+    </a>
+  </div>
+</article>

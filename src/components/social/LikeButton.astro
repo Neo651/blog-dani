@@ -1,0 +1,152 @@
+---
+/*
+====================================================
+LikeButton
+
+Responsabilidad
+Permitir que una persona exprese conexión con una reflexión y mostrar el total con lenguaje humano.
+
+Qué renderiza
+Un botón persistente con estado cargando, conectado o no conectado, además de errores comprensibles.
+
+Datos que recibe
+El identificador numérico de la reflexión y una presentación opcional. La variante editorial separa acción y contador;
+la variante compacta conserva el comportamiento existente de la Landing.
+
+Dependencias
+Servicio centralizado de likes; el componente no conoce tablas ni construye consultas.
+
+Qué no debe hacer
+No presenta rankings, no exagera popularidad y no permite solicitudes concurrentes durante una actualización.
+
+Decisión de interacción
+Después de guardar se vuelve a consultar el estado canónico. Esto prioriza consistencia con RLS frente a una cifra
+optimista que podría no haberse persistido.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  reflectionId: number;
+  presentation?: 'compact' | 'editorial';
+}
+
+const { reflectionId, presentation = 'compact' } = Astro.props;
+const isEditorial = presentation === 'editorial';
+---
+
+<div data-like-root data-reflection-id={reflectionId} data-like-presentation={presentation}>
+  {
+    isEditorial ? (
+      <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <button
+          type="button"
+          data-like-button
+          disabled
+          class="group inline-flex min-h-12 items-center gap-3 rounded-full border border-amber-700/25 bg-amber-50/70 px-5 py-3 text-sm font-semibold text-stone-800 transition duration-200 hover:border-amber-600/50 hover:bg-amber-100/70 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-amber-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-amber-700/35 dark:bg-amber-950/20 dark:text-stone-100 dark:hover:border-amber-600/60 dark:hover:bg-amber-950/35"
+          aria-label="Me gustó esta reflexión"
+          aria-pressed="false"
+        >
+          <span data-like-icon aria-hidden="true" class="text-xl leading-none text-amber-700 dark:text-amber-400">
+            ♡
+          </span>
+          <span data-like-action>Me gustó esta reflexión</span>
+        </button>
+        <p data-like-label class="text-sm text-stone-500 dark:text-stone-400" aria-live="polite">
+          Cargando conexiones…
+        </p>
+      </div>
+    ) : (
+      <button
+        type="button"
+        data-like-button
+        disabled
+        class="inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 px-5 py-2.5 text-sm font-semibold text-stone-700 transition duration-200 hover:border-amber-500 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-amber-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:text-stone-300 dark:hover:border-amber-700 dark:hover:text-stone-50"
+        aria-label="Conectar con esta reflexión"
+        aria-pressed="false"
+      >
+        <span data-like-icon aria-hidden="true">
+          ♡
+        </span>
+        <span data-like-label aria-live="polite">
+          Cargando conexiones…
+        </span>
+      </button>
+    )
+  }
+  <p data-like-error class="mt-2 hidden text-sm text-red-700"></p>
+</div>
+
+<script>
+  import { ensureLikeUser, getLikeState, setLiked } from '~/features/likes/service';
+
+  const initialize = async (root: Element) => {
+    if (!(root instanceof HTMLElement) || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+    const button = root.querySelector('[data-like-button]');
+    const icon = root.querySelector('[data-like-icon]');
+    const label = root.querySelector('[data-like-label]');
+    const count = root.querySelector('[data-like-count]');
+    const errorElement = root.querySelector('[data-like-error]');
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    const reflectionId = Number(root.dataset.reflectionId);
+    let busy = false;
+    let liked = false;
+    let userId = '';
+
+    const showError = (message: string) => {
+      if (errorElement instanceof HTMLElement) {
+        errorElement.textContent = message;
+        errorElement.classList.toggle('hidden', !message);
+      }
+    };
+
+    const render = (state: { count: number; liked: boolean }) => {
+      liked = state.liked;
+      if (icon instanceof HTMLElement) icon.textContent = liked ? '♥' : '♡';
+      const action = root.querySelector('[data-like-action]');
+      if (action instanceof HTMLElement)
+        action.textContent = liked ? 'Te gustó esta reflexión' : 'Me gustó esta reflexión';
+      if (label instanceof HTMLElement) {
+        label.textContent =
+          state.count === 1
+            ? '1 persona conectó con esta reflexión'
+            : `${state.count} personas conectaron con esta reflexión`;
+      }
+      if (count instanceof HTMLElement) count.textContent = '';
+      button.setAttribute('aria-pressed', String(liked));
+    };
+
+    try {
+      const user = await ensureLikeUser();
+      userId = user.id;
+      render(await getLikeState(reflectionId, userId));
+      button.disabled = false;
+    } catch (error) {
+      showError(error instanceof Error ? error.message : 'No se pudieron cargar los corazones.');
+      return;
+    }
+
+    button.addEventListener('click', async () => {
+      if (busy) return;
+      busy = true;
+      button.disabled = true;
+      showError('');
+      try {
+        await setLiked(reflectionId, userId, !liked);
+        render(await getLikeState(reflectionId, userId));
+      } catch (error) {
+        showError(error instanceof Error ? error.message : 'No se pudo guardar el corazón.');
+      } finally {
+        busy = false;
+        button.disabled = false;
+      }
+    });
+  };
+
+  const initializeAll = () => document.querySelectorAll('[data-like-root]').forEach(initialize);
+  initializeAll();
+  document.addEventListener('astro:page-load', initializeAll);
+</script>

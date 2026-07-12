@@ -1,37 +1,20 @@
 import { getRssString } from '@astrojs/rss';
+import type { APIRoute } from 'astro';
+import { siteConfig } from '~/config/site';
+import { getPublishedReflections } from '~/features/reflections/service';
 
-import { SITE, METADATA, APP_BLOG } from 'astrowind:config';
-import { fetchPosts } from '~/utils/blog';
-import { getPermalink } from '~/utils/permalinks';
-
-export const GET = async () => {
-  if (!APP_BLOG.isEnabled) {
-    return new Response(null, {
-      status: 404,
-      statusText: 'Not found',
-    });
-  }
-
-  const posts = await fetchPosts();
-
+export const GET: APIRoute = async ({ site }) => {
+  const reflections = await getPublishedReflections(50);
   const rss = await getRssString({
-    title: `${SITE.name}’s Blog`,
-    description: METADATA?.description || '',
-    site: import.meta.env.SITE,
-
-    items: posts.map((post) => ({
-      link: getPermalink(post.permalink, 'post'),
-      title: post.title,
-      description: post.excerpt,
-      pubDate: post.publishDate,
+    title: `Reflexiones de ${siteConfig.brand.name}`,
+    description: siteConfig.brand.description,
+    site: site ?? new URL(siteConfig.brand.siteUrl),
+    items: reflections.map((reflection) => ({
+      link: `/reflexiones/${reflection.slug}`,
+      title: reflection.title,
+      description: reflection.body.replace(/\s+/g, ' ').slice(0, 200),
+      pubDate: new Date(reflection.published_at),
     })),
-
-    trailingSlash: SITE.trailingSlash,
   });
-
-  return new Response(rss, {
-    headers: {
-      'Content-Type': 'application/xml',
-    },
-  });
+  return new Response(rss, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
 };

@@ -1,6 +1,6 @@
 site:
   name: Daniel Montesinos
-  site: 'https://astrowind.vercel.app'
+  site: 'https://danielmontesinos.com'
   base: '/'
   trailingSlash: false
 
@@ -11,29 +11,29 @@ metadata:
   title:
     default: Daniel Montesinos
     template: '%s — Daniel Montesinos'
-  description: "\U0001F680 🌱 Reflexiones para crecer con propósito."
+  description: 'Reflexiones para pensar con claridad, crecer con propósito y vivir mejor.'
   robots:
     index: true
     follow: true
   openGraph:
-    site_name: AstroWind
+    site_name: Daniel Montesinos
     images:
       - url: '~/assets/images/default.png'
         width: 1200
         height: 628
     type: website
   twitter:
-    handle: '@arthelokyo'
-    site: '@arthelokyo'
+    handle: ''
+    site: ''
     cardType: summary_large_image
 
 i18n:
-  language: en
+  language: es-PE
   textDirection: ltr
 
 apps:
   blog:
-    isEnabled: true
+    isEnabled: false
     postsPerPage: 6
 
     post:

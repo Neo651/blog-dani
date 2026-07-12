@@ -1,0 +1,50 @@
+---
+/*
+====================================================
+ReadingActions
+
+Responsabilidad
+Unir la reacción humana y las opciones de compartir inmediatamente después del contenido.
+
+Qué renderiza
+LikeButton persistente y ShareActions en una composición secundaria y responsive.
+
+Datos que recibe
+Identificador de reflexión y metadata pública necesaria para compartir.
+
+Dependencias
+LikeButton y ShareActions.
+
+Qué no debe hacer
+No implementa persistencia propia, no consulta Supabase y no destaca métricas de popularidad.
+
+Decisión de flujo
+El like aparece primero porque responde a la emoción de la lectura. Compartir ocupa después una fila completa para que
+ninguna acción desaparezca por compresión en desktop y para conservar el mismo orden mental en todos los breakpoints.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import LikeButton from '~/components/social/LikeButton.astro';
+import ShareActions from '~/components/social/ShareActions.astro';
+
+export interface Props {
+  reflectionId: number;
+  canonicalUrl: string;
+  title: string;
+  description: string;
+}
+
+const { reflectionId, canonicalUrl, title, description } = Astro.props;
+---
+
+<aside
+  aria-label="Acciones de la reflexión"
+  class="mx-auto max-w-[42rem] border-t border-stone-200 pt-5 dark:border-white/[0.08] sm:pt-6"
+>
+  <LikeButton reflectionId={reflectionId} presentation="editorial" />
+  <div class="mt-5 border-t border-stone-200/70 pt-5 dark:border-white/[0.06]">
+    <ShareActions canonicalUrl={canonicalUrl} title={title} description={description} />
+  </div>
+</aside>

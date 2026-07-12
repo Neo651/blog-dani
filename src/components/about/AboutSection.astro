@@ -1,0 +1,80 @@
+---
+/*
+====================================================
+AboutSection
+
+Responsabilidad
+Presentar a Daniel desde la cercanía, la humildad y el propósito del proyecto.
+
+Qué hace
+Combina fotografía, presentación y filosofía en una composición editorial.
+
+Qué no hace
+No funciona como currículum ni consulta información remota.
+
+Dependencias
+Componente Image y configuración pública tipada.
+
+Decisión de diseño
+El texto se eleva mínimamente porque el torso aporta más peso visual a la mitad inferior de la fotografía.
+Este ajuste óptico busca equilibrio percibido y no una coincidencia matemática entre bordes.
+
+Cómo extenderlo
+Una futura página Sobre mí puede reutilizar esta composición y recibir los mismos datos sin duplicar fotografía ni copy.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import Image from '~/components/common/Image.astro';
+import type { SiteConfig } from '~/config/site';
+
+export interface Props {
+  about: SiteConfig['about'];
+}
+
+const { about } = Astro.props;
+---
+
+<section
+  class="relative overflow-hidden border-y border-stone-200/80 bg-stone-50/70 px-6 py-18 dark:border-white/[0.07] dark:bg-white/[0.025] sm:py-20 lg:py-24"
+>
+  <div
+    class="pointer-events-none absolute -right-40 top-20 h-80 w-80 rounded-full bg-amber-100/60 blur-3xl dark:bg-amber-950/15"
+    aria-hidden="true"
+  >
+  </div>
+  <div class="landing-section-reveal mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+    <div
+      class="overflow-hidden rounded-[2rem] bg-stone-200 shadow-[0_28px_80px_-42px_rgba(28,25,23,0.5)] dark:bg-stone-800"
+    >
+      <Image
+        src={about.image}
+        alt={about.imageAlt}
+        width={720}
+        height={900}
+        widths={[420, 720, 960]}
+        sizes="(max-width: 1023px) 100vw, 42vw"
+        format="webp"
+        loading="lazy"
+        class="aspect-[4/5] h-full w-full object-cover object-top transition duration-700 hover:scale-[1.015]"
+      />
+    </div>
+    <!-- El leve desplazamiento óptico compensa el peso de la fotografía sin forzar una alineación matemática. -->
+    <div id="sobre-daniel" class="landing-anchor landing-anchor-about relative max-w-2xl lg:-translate-y-2">
+      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
+        {about.eyebrow}
+      </p>
+      <h2
+        class="mt-5 text-balance text-4xl font-semibold tracking-[-0.035em] text-stone-950 dark:text-stone-50 sm:text-5xl"
+      >
+        {about.title}
+      </h2>
+      <div
+        class="mt-8 space-y-6 border-l border-amber-300 pl-6 text-lg leading-8 text-stone-600 dark:border-amber-800 dark:text-stone-300 sm:pl-8"
+      >
+        {about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
+  </div>
+</section>

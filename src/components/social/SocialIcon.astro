@@ -1,0 +1,83 @@
+---
+/*
+====================================================
+SocialIcon
+
+Responsabilidad
+Representar visualmente cada canal social prioritario.
+
+Qué renderiza
+Un icono SVG pequeño que hereda el color del texto de su tarjeta.
+
+Datos que recibe
+El identificador estable de la plataforma.
+
+Dependencias
+Ninguna dependencia externa; los SVG evitan añadir JavaScript o peso de librerías.
+
+Qué no debe hacer
+No decide si una red está disponible ni construye enlaces.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  name: 'linkedin' | 'instagram' | 'tiktok' | 'github' | 'email';
+}
+
+const { name } = Astro.props;
+const sharedAttributes = {
+  class: 'h-5 w-5',
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  'stroke-width': 1.8,
+  'stroke-linecap': 'round' as const,
+  'stroke-linejoin': 'round' as const,
+  'aria-hidden': 'true' as const,
+};
+---
+
+{
+  name === 'linkedin' ? (
+    <svg {...sharedAttributes}>
+      <>
+        <path d="M7 9v8" />
+        <path d="M7 6.5v.01" />
+        <path d="M11 17v-4.5a3 3 0 0 1 6 0V17" />
+        <path d="M11 9v8" />
+        <rect x="3" y="3" width="18" height="18" rx="4" />
+      </>
+    </svg>
+  ) : name === 'instagram' ? (
+    <svg {...sharedAttributes}>
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <path d="M17.5 6.5h.01" />
+      </>
+    </svg>
+  ) : name === 'tiktok' ? (
+    <svg {...sharedAttributes}>
+      <>
+        <path d="M14 4v10.5a4 4 0 1 1-3-3.87" />
+        <path d="M14 4c.5 2.5 2 4 4.5 4.5" />
+      </>
+    </svg>
+  ) : name === 'github' ? (
+    <svg {...sharedAttributes}>
+      <>
+        <path d="M9 19c-4.5 1.4-4.5-2.5-6-3" />
+        <path d="M15 22v-3.5c0-1 .1-1.4-.5-2 3.3-.4 6.8-1.6 6.8-7.4A5.8 5.8 0 0 0 19.8 5a5.4 5.4 0 0 0-.2-4S18.4.6 15 2.5a14 14 0 0 0-6 0C5.6.6 4.4 1 4.4 1A5.4 5.4 0 0 0 4.2 5a5.8 5.8 0 0 0-1.5 4.1c0 5.8 3.5 7 6.8 7.4-.6.6-.6 1.2-.5 2V22" />
+      </>
+    </svg>
+  ) : (
+    <svg {...sharedAttributes}>
+      <>
+        <rect x="3" y="5" width="18" height="14" rx="3" />
+        <path d="m4 7 8 6 8-6" />
+      </>
+    </svg>
+  )
+}

@@ -1,0 +1,42 @@
+---
+/*
+====================================================
+ReadingNavigation
+
+Responsabilidad
+Orientar al lector antes de comenzar sin añadir una barra de navegación paralela.
+
+Qué renderiza
+Un regreso principal a la biblioteca y un acceso secundario al inicio.
+
+Datos que recibe
+No recibe datos; usa rutas estables del producto.
+
+Dependencias
+Ninguna.
+
+Qué no debe hacer
+No duplica el header global ni añade acciones que compitan con el título.
+
+Decisión de UX
+Los enlaces aparecen antes del artículo. Después de leer, las tarjetas relacionadas cumplen la función de continuar.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+---
+
+<nav aria-label="Navegación de lectura" class="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
+  <a
+    href="/reflexiones"
+    class="rounded-sm font-semibold text-stone-700 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
+  >
+    ← Todas las reflexiones
+  </a>
+  <a
+    href="/"
+    class="rounded-sm text-stone-500 transition hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:text-stone-500 dark:hover:text-stone-200"
+  >
+    Ir al inicio
+  </a>
+</nav>

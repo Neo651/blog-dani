@@ -1,0 +1,73 @@
+---
+/*
+====================================================
+HeroSection
+
+Responsabilidad
+Comunicar el propósito del sitio y orientar el primer paso del lector.
+
+Qué hace
+Presenta la promesa principal y dos caminos de navegación jerarquizados.
+
+Qué no hace
+No consulta contenido ni administra interacciones de negocio.
+
+Dependencias
+Configuración pública tipada del sitio.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import HeroBackground from '~/components/home/HeroBackground.astro';
+import type { SiteConfig } from '~/config/site';
+
+export interface Props {
+  hero: SiteConfig['hero'];
+}
+
+const { hero } = Astro.props;
+const titleLines = hero.title.split('\n');
+---
+
+<section class="hero-atmosphere relative isolate overflow-hidden px-6 pb-20 pt-20 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-32">
+  <!-- El fondo vive fuera del contenido para que el futuro Fondo Vivo no altere semántica ni layout. -->
+  <HeroBackground />
+  <div id="inicio" class="landing-anchor mx-auto max-w-4xl text-center">
+    <p
+      class="landing-reveal text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm"
+    >
+      {hero.eyebrow}
+    </p>
+    <h1
+      class="landing-reveal landing-reveal-delay-1 mt-8 text-balance text-5xl font-semibold leading-[1.02] tracking-[-0.045em] text-stone-950 dark:text-stone-50 sm:text-7xl lg:text-[5.75rem]"
+    >
+      {
+        titleLines.map((line, index) => (
+          <>
+            {index > 0 && <br />}
+            {line}
+          </>
+        ))
+      }
+    </h1>
+    <p
+      class="landing-reveal landing-reveal-delay-2 mx-auto mt-8 max-w-2xl text-pretty text-lg leading-8 text-stone-600 dark:text-stone-300 sm:text-xl sm:leading-9"
+    >
+      {hero.description}
+    </p>
+    <a
+      href={hero.cta.href}
+      class="landing-reveal landing-reveal-delay-3 mt-11 inline-flex min-h-12 items-center justify-center rounded-full bg-stone-950 px-7 py-3 text-base font-semibold text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:scale-[1.015] hover:bg-stone-800 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white"
+    >
+      {hero.cta.label}<span aria-hidden="true" class="ml-2">↓</span>
+    </a>
+    <p class="landing-reveal landing-reveal-delay-4 mt-5">
+      <a
+        href={hero.aboutCta.href}
+        class="inline-flex rounded-sm px-2 py-1 text-sm font-semibold text-stone-500 transition duration-300 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 dark:text-stone-400 dark:hover:text-stone-50"
+        >{hero.aboutCta.label}</a
+      >
+    </p>
+  </div>
+</section>

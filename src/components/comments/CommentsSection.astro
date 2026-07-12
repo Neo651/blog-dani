@@ -1,0 +1,234 @@
+---
+/*
+====================================================
+CommentsSection
+
+Responsabilidad
+Presentar la conversación asociada a una reflexión y conectar la UI con los servicios existentes.
+
+Qué hace
+Muestra el acceso, el editor y los comentarios aprobados con estados comprensibles y cercanos.
+
+Datos que recibe
+El id de la reflexión, la ruta segura de retorno OAuth y un modo visual opcional para integrarse al flujo de lectura.
+
+Decisión de diseño
+La composición evita la apariencia de formulario: primero invita a pensar y después ofrece un editor discreto.
+La participación aparece antes de la lista porque prolonga la emoción inmediata del texto; las respuestas aprobadas
+continúan después como conversación, exactamente en el orden mental invitación → respuesta propia → comunidad.
+
+Qué no hace
+No define permisos, políticas RLS ni reglas de moderación; esas responsabilidades permanecen en sus servicios.
+
+Dependencias
+Servicios existentes de autenticación y comentarios.
+
+Cómo se extiende
+Las futuras mejoras de moderación deben vivir en servicios y RLS. El modo visual solo puede ajustar composición,
+nunca permisos ni reglas de negocio.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  reflectionId: number;
+  returnTo: string;
+  mode?: 'default' | 'reading';
+}
+
+const { reflectionId, returnTo, mode = 'default' } = Astro.props;
+const isReadingMode = mode === 'reading';
+---
+
+<section
+  data-comments-root
+  data-reflection-id={reflectionId}
+  data-return-to={returnTo}
+  class:list={[
+    'mx-auto border-t border-stone-200 px-1 dark:border-white/[0.07]',
+    isReadingMode ? 'mt-5 max-w-[42rem] pt-6 sm:mt-6 sm:px-0' : 'mt-14 max-w-3xl pt-10 sm:px-6',
+  ]}
+>
+  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 dark:text-stone-400">
+    La conversación continúa
+  </p>
+  <h2 class="mt-3 text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+    ¿Qué idea se quedó contigo?
+  </h2>
+  <p class="mt-3 text-stone-500 dark:text-stone-400">
+    No hace falta tener una respuesta perfecta. Comparte una pregunta, una experiencia o una perspectiva distinta.
+  </p>
+
+  <div data-comments-auth class="mt-6"></div>
+  <form data-comment-form class="mt-6 hidden">
+    <label for={`comment-${reflectionId}`} class="sr-only">Escribe tu comentario</label>
+    <textarea
+      id={`comment-${reflectionId}`}
+      data-comment-content
+      required
+      maxlength="1000"
+      rows="4"
+      placeholder="Escribe con calma…"
+      class="w-full resize-y rounded-2xl border border-stone-300 bg-white/70 p-4 leading-7 shadow-inner shadow-stone-100 transition placeholder:text-stone-400 focus:border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-600/20 dark:border-white/10 dark:bg-white/[0.025] dark:shadow-none dark:focus:border-amber-600"
+    ></textarea>
+    <button
+      type="submit"
+      class="mt-3 rounded-full bg-stone-950 px-5 py-3 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 disabled:cursor-wait disabled:opacity-60 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white"
+    >
+      Publicar comentario
+    </button>
+  </form>
+  <p data-comments-message class="mt-4 hidden rounded-xl p-3 text-sm"></p>
+  <div data-comments-list class="mt-8 space-y-5" aria-live="polite">
+    <p class="text-gray-500">Cargando comentarios…</p>
+  </div>
+</section>
+
+<script>
+  import { getCurrentUser, signInWithGoogle } from '~/features/auth/service';
+  import { createComment, deleteComment, getApprovedComments, updateComment } from '~/features/comments/service';
+  import type { Comment } from '~/features/comments/types';
+
+  const initialize = async (root: Element) => {
+    if (!(root instanceof HTMLElement) || root.dataset.initialized === 'true') return;
+    root.dataset.initialized = 'true';
+    const reflectionId = Number(root.dataset.reflectionId);
+    const returnTo = root.dataset.returnTo || '/';
+    const auth = root.querySelector('[data-comments-auth]');
+    const form = root.querySelector('[data-comment-form]');
+    const textarea = root.querySelector('[data-comment-content]');
+    const list = root.querySelector('[data-comments-list]');
+    const message = root.querySelector('[data-comments-message]');
+    let userId = '';
+    let isAdmin = false;
+
+    const notify = (text: string, error = false) => {
+      if (!(message instanceof HTMLElement)) return;
+      message.textContent = text;
+      message.className = `mt-4 rounded-xl p-3 text-sm ${error ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`;
+    };
+
+    const load = async () => {
+      if (!(list instanceof HTMLElement)) return;
+      try {
+        const comments = await getApprovedComments(reflectionId);
+        list.replaceChildren();
+        if (!comments.length) {
+          const empty = document.createElement('p');
+          empty.className = 'text-gray-500';
+          empty.textContent = 'Todavía no hay respuestas. Si algo resonó contigo, puedes iniciar la conversación.';
+          list.append(empty);
+          return;
+        }
+        comments.forEach((comment: Comment) => {
+          const article = document.createElement('article');
+          article.className = 'rounded-2xl border border-gray-200 p-5 dark:border-gray-800';
+          const header = document.createElement('div');
+          header.className = 'flex items-center gap-3';
+          if (comment.user_avatar) {
+            const avatar = document.createElement('img');
+            avatar.src = comment.user_avatar;
+            avatar.alt = '';
+            avatar.className = 'h-10 w-10 rounded-full';
+            header.append(avatar);
+          }
+          const identity = document.createElement('div');
+          const name = document.createElement('p');
+          name.className = 'font-semibold';
+          name.textContent = comment.user_name;
+          const date = document.createElement('time');
+          date.className = 'text-sm text-gray-500';
+          date.dateTime = comment.created_at;
+          date.textContent = new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium' }).format(
+            new Date(comment.created_at)
+          );
+          identity.append(name, date);
+          header.append(identity);
+          const content = document.createElement('p');
+          content.className = 'mt-4 whitespace-pre-wrap text-gray-700 dark:text-gray-300';
+          content.textContent = comment.content;
+          article.append(header, content);
+
+          if (comment.user_id === userId || isAdmin) {
+            const actions = document.createElement('div');
+            actions.className = 'mt-4 flex gap-4 text-sm';
+            const edit = document.createElement('button');
+            edit.type = 'button';
+            edit.textContent = 'Editar';
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.textContent = 'Eliminar';
+            remove.className = 'text-red-700';
+            edit.classList.toggle('hidden', comment.user_id !== userId);
+            edit.addEventListener('click', async () => {
+              const next = window.prompt('Edita tu comentario', comment.content)?.trim();
+              if (!next || next === comment.content) return;
+              try {
+                await updateComment(comment.id, next);
+                await load();
+              } catch (error) {
+                notify(error instanceof Error ? error.message : 'No se pudo editar.', true);
+              }
+            });
+            remove.addEventListener('click', async () => {
+              if (!window.confirm('¿Eliminar este comentario?')) return;
+              try {
+                await deleteComment(comment.id);
+                await load();
+              } catch (error) {
+                notify(error instanceof Error ? error.message : 'No se pudo eliminar.', true);
+              }
+            });
+            actions.append(edit, remove);
+            article.append(actions);
+          }
+          list.append(article);
+        });
+      } catch (error) {
+        list.textContent = error instanceof Error ? error.message : 'No se pudieron cargar los comentarios.';
+      }
+    };
+
+    try {
+      const user = await getCurrentUser();
+      if (user && !user.is_anonymous) {
+        userId = user.id;
+        isAdmin = Boolean(import.meta.env.PUBLIC_ADMIN_EMAIL && user.email === import.meta.env.PUBLIC_ADMIN_EMAIL);
+        form?.classList.remove('hidden');
+        if (auth instanceof HTMLElement)
+          auth.textContent = `Comentas como ${String(user.user_metadata.full_name ?? user.email ?? 'lector')}.`;
+      } else if (auth instanceof HTMLElement) {
+        const login = document.createElement('button');
+        login.type = 'button';
+        login.className = 'rounded-full border border-gray-300 px-5 py-3 font-semibold dark:border-gray-700';
+        login.textContent = 'Continuar con Google';
+        login.addEventListener('click', () => signInWithGoogle(returnTo));
+        auth.append(login);
+      }
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'No se pudo comprobar la sesión.', true);
+    }
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!(textarea instanceof HTMLTextAreaElement) || !textarea.value.trim()) return;
+      const button = form.querySelector('button');
+      if (button instanceof HTMLButtonElement) button.disabled = true;
+      try {
+        await createComment(reflectionId, textarea.value);
+        textarea.value = '';
+        notify('Comentario enviado. Aparecerá cuando sea aprobado.');
+      } catch (error) {
+        notify(error instanceof Error ? error.message : 'No se pudo publicar.', true);
+      } finally {
+        if (button instanceof HTMLButtonElement) button.disabled = false;
+      }
+    });
+    await load();
+  };
+
+  const initializeAll = () => document.querySelectorAll('[data-comments-root]').forEach(initialize);
+  initializeAll();
+  document.addEventListener('astro:page-load', initializeAll);
+</script>
