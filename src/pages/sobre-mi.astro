@@ -1,0 +1,144 @@
+---
+/*
+====================================================
+Página Sobre mí
+
+Responsabilidad
+Presentar la persona, el propósito y los valores detrás de las reflexiones mediante datos públicos y verificables.
+
+Qué renderiza
+Encabezado editorial, presentación compartida con Home, historia de marca, ecosistema, redes y cierre humano.
+
+Datos que recibe
+Toda la información procede de siteConfig; la página no mantiene una segunda copia de fotografía, enlaces o narrativa.
+
+Dependencias
+AboutSection, PersonalBrandStory, SocialSection, PageLayout y metadata pública del sitio.
+
+Qué no debe hacer
+No consulta Supabase, no inventa trayectoria profesional y no implementa los canales futuros del ecosistema.
+
+Decisión SEO
+Person JSON-LD incluye únicamente nombre, sitio, fotografía, correo público y perfiles activos confirmados. Se omiten
+cargo, empresa, estudios y cualquier atributo que no tenga una fuente real dentro del proyecto.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import AboutSection from '~/components/about/AboutSection.astro';
+import PersonalBrandStory from '~/components/about/PersonalBrandStory.astro';
+import SocialSection from '~/components/social/SocialSection.astro';
+import { getImage } from 'astro:assets';
+import { siteConfig } from '~/config/site';
+import Layout from '~/layouts/PageLayout.astro';
+
+const canonical = `${siteConfig.brand.siteUrl}/sobre-mi`;
+// La tarjeta social usa una transformación de Astro para producir una URL pública estable en el build.
+// Mantener la misma fuente de configuración evita una segunda fotografía que pueda quedar desactualizada.
+const socialPortrait = await getImage({
+  src: siteConfig.about.image,
+  width: siteConfig.about.image.width,
+  format: 'jpg',
+  quality: 82,
+});
+const portraitUrl = new URL(socialPortrait.src, siteConfig.brand.siteUrl).toString();
+const activeProfiles = siteConfig.social.links
+  .filter((link) => link.available && link.external && link.href.startsWith('https://'))
+  .map((link) => link.href);
+const metadata = {
+  title: siteConfig.personalBrand.seo.title,
+  description: siteConfig.personalBrand.seo.description,
+  canonical,
+  author: siteConfig.brand.name,
+  openGraph: {
+    type: 'profile',
+    images: [
+      {
+        url: portraitUrl,
+        width: Number(socialPortrait.attributes.width),
+        height: Number(socialPortrait.attributes.height),
+      },
+    ],
+  },
+  twitter: { cardType: 'summary_large_image' },
+};
+const personStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: siteConfig.brand.name,
+  url: canonical,
+  image: portraitUrl,
+  email: `mailto:${siteConfig.brand.email}`,
+  description: siteConfig.personalBrand.seo.description,
+  sameAs: activeProfiles,
+};
+// Escapar el carácter evita que una futura cadena configurable pueda cerrar prematuramente el script JSON-LD.
+const personStructuredDataJson = JSON.stringify(personStructuredData).replace(/</g, '\\u003c');
+---
+
+<Layout metadata={metadata}>
+  <script type="application/ld+json" is:inline set:html={personStructuredDataJson} />
+
+  <div class="personal-brand-experience">
+    <header class="px-5 pb-14 pt-14 sm:px-6 sm:pb-18 sm:pt-18 lg:pb-20 lg:pt-20">
+      <div class="mx-auto max-w-6xl">
+        <div class="max-w-3xl">
+          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
+            {siteConfig.personalBrand.eyebrow}
+          </p>
+          <h1
+            class="mt-4 text-balance text-5xl font-semibold tracking-[-0.04em] text-stone-950 dark:text-stone-50 sm:text-6xl"
+          >
+            {siteConfig.personalBrand.title}
+          </h1>
+          <p
+            class="mt-6 max-w-2xl text-pretty text-lg leading-8 text-stone-600 dark:text-stone-300 sm:text-xl sm:leading-9"
+          >
+            {siteConfig.personalBrand.introduction}
+          </p>
+        </div>
+
+        <nav
+          aria-label="Continuar desde Sobre mí"
+          class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-stone-200/80 py-4 text-sm dark:border-white/[0.08]"
+        >
+          <a
+            href="/"
+            class="inline-flex min-h-11 items-center rounded-sm font-medium text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
+          >
+            ← Volver al inicio
+          </a>
+          <a
+            href="/reflexiones"
+            class="inline-flex min-h-11 items-center rounded-sm font-semibold text-stone-900 transition hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-100 dark:hover:text-amber-300"
+          >
+            Explorar reflexiones
+          </a>
+          <a
+            href="#redes"
+            class="inline-flex min-h-11 items-center rounded-sm font-medium text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
+          >
+            Sigamos conversando
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <AboutSection about={siteConfig.about} variant="profile" />
+    <PersonalBrandStory personalBrand={siteConfig.personalBrand} />
+    <SocialSection social={siteConfig.social} variant="profile" />
+
+    <section class="border-t border-stone-200 px-5 py-16 text-center dark:border-white/[0.08] sm:px-6 sm:py-20">
+      <div class="mx-auto max-w-2xl">
+        <span aria-hidden="true" class="text-base text-amber-700/60 dark:text-amber-400/50">✦</span>
+        <p class="mt-5 text-pretty text-xl leading-8 text-stone-700 dark:text-stone-300 sm:text-2xl sm:leading-9">
+          {siteConfig.personalBrand.closing.message}
+        </p>
+        <p class="mt-5 text-sm font-semibold text-stone-900 dark:text-stone-100">
+          {siteConfig.personalBrand.closing.signature}
+        </p>
+      </div>
+    </section>
+  </div>
+</Layout>

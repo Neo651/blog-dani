@@ -7,10 +7,10 @@ Responsabilidad
 Ofrecer una continuación natural de la conversación fuera del blog.
 
 Qué renderiza
-Cuatro canales prioritarios, compactos y del mismo tamaño, con su estado actual.
+Canales compactos con su estado actual. Landing prioriza cuatro; la página personal puede incluir canales secundarios.
 
 Datos que recibe
-Copy y enlaces sociales procedentes de la configuración pública centralizada.
+Copy, enlaces sociales y una variante de superficie procedentes de la configuración pública centralizada.
 
 Dependencias
 SocialIcon y configuración pública tipada del sitio.
@@ -34,17 +34,24 @@ import type { SiteConfig } from '~/config/site';
 
 export interface Props {
   social: SiteConfig['social'];
+  variant?: 'landing' | 'profile';
 }
 
-const { social } = Astro.props;
+const { social, variant = 'landing' } = Astro.props;
+const isLanding = variant === 'landing';
 
 // La prioridad vive en configuración para poder mover GitHub u otra red sin rediseñar el componente.
-const prioritySocialLinks = social.links.filter((link) => link.priority);
+const visibleSocialLinks = isLanding ? social.links.filter((link) => link.priority) : social.links;
 ---
 
-<section class="relative overflow-hidden px-5 py-10 sm:px-6 sm:py-12 lg:py-14">
+<section
+  class:list={['relative overflow-hidden px-5 sm:px-6', isLanding ? 'py-10 sm:py-12 lg:py-14' : 'py-16 sm:py-20']}
+>
   <div class="mx-auto max-w-5xl">
-    <div id="contacto" class="landing-anchor landing-section-reveal max-w-xl">
+    <div
+      id={isLanding ? 'contacto' : 'redes'}
+      class:list={['max-w-xl', isLanding && 'landing-anchor landing-section-reveal']}
+    >
       <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
         {social.eyebrow}
       </p>
@@ -54,11 +61,11 @@ const prioritySocialLinks = social.links.filter((link) => link.priority);
       <p class="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-400">{social.description}</p>
     </div>
 
-    <ul class="mt-5 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+    <ul class:list={['mt-5 grid grid-cols-2 gap-2.5', isLanding ? 'lg:grid-cols-4' : 'sm:grid-cols-2 lg:grid-cols-5']}>
       {
-        prioritySocialLinks.map((link) => (
+        visibleSocialLinks.map((link: SiteConfig['social']['links'][number]) => (
           <li class="min-w-0">
-            {link.available ? (
+            {link.available && link.href ? (
               <a
                 href={link.href}
                 target={link.external ? '_blank' : undefined}

@@ -1,0 +1,172 @@
+---
+/*
+====================================================
+PersonalBrandStory
+
+Responsabilidad
+Ampliar el propósito y los valores de Daniel sin convertir la página personal en una biografía o currículum.
+
+Qué renderiza
+El origen del blog, principios personales, cómo nacen las reflexiones, el ecosistema futuro y un CTA hacia la biblioteca.
+
+Datos que recibe
+Toda la narrativa pública de marca desde la configuración centralizada.
+
+Dependencias
+Únicamente el tipo SiteConfig. No necesita JavaScript, servicios ni datos remotos.
+
+Qué no debe hacer
+No inventa trayectoria, cargos o logros; tampoco implementa los canales futuros que presenta como dirección de marca.
+
+Decisión de diseño
+Los bloques alternan texto, listas y pausas horizontales para sostener una lectura editorial continua sin parecer una
+colección de tarjetas promocionales. El ecosistema comunica intención, no enlaces a productos inexistentes.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import type { SiteConfig } from '~/config/site';
+
+export interface Props {
+  personalBrand: SiteConfig['personalBrand'];
+}
+
+const { personalBrand } = Astro.props;
+---
+
+<div class="px-5 sm:px-6">
+  <div class="mx-auto max-w-6xl">
+    <section class="grid gap-8 py-16 sm:py-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20" aria-labelledby="brand-purpose">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.26em] text-stone-500 dark:text-stone-400">
+          {personalBrand.purpose.eyebrow}
+        </p>
+        <h2
+          id="brand-purpose"
+          class="mt-4 text-balance text-3xl font-semibold tracking-[-0.03em] text-stone-950 dark:text-stone-50 sm:text-4xl"
+        >
+          {personalBrand.purpose.title}
+        </h2>
+      </div>
+      <div class="space-y-5 text-lg leading-8 text-stone-600 dark:text-stone-300 sm:text-xl sm:leading-9">
+        {personalBrand.purpose.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </section>
+
+    <section
+      class="border-t border-stone-200 py-16 dark:border-white/[0.08] sm:py-20"
+      aria-labelledby="brand-principles"
+    >
+      <div class="max-w-3xl">
+        <p class="text-xs font-semibold uppercase tracking-[0.26em] text-stone-500 dark:text-stone-400">
+          {personalBrand.principles.eyebrow}
+        </p>
+        <h2
+          id="brand-principles"
+          class="mt-4 text-balance text-3xl font-semibold tracking-[-0.03em] text-stone-950 dark:text-stone-50 sm:text-4xl"
+        >
+          {personalBrand.principles.title}
+        </h2>
+      </div>
+      <ol class="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
+        {
+          personalBrand.principles.items.map((principle, index) => (
+            <li class="border-t border-stone-200 pt-5 dark:border-white/[0.08]">
+              <span class="text-xs font-semibold tabular-nums text-amber-800 dark:text-amber-300">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3 class="mt-3 text-xl font-semibold tracking-tight text-stone-950 dark:text-stone-50">
+                {principle.title}
+              </h3>
+              <p class="mt-3 text-sm leading-6 text-stone-600 dark:text-stone-400">{principle.description}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="border-t border-stone-200 py-16 dark:border-white/[0.08] sm:py-20" aria-labelledby="brand-origin">
+      <div class="mx-auto max-w-3xl text-center">
+        <p class="text-xs font-semibold uppercase tracking-[0.26em] text-stone-500 dark:text-stone-400">
+          {personalBrand.origin.eyebrow}
+        </p>
+        <h2
+          id="brand-origin"
+          class="mt-4 text-balance text-3xl font-semibold tracking-[-0.03em] text-stone-950 dark:text-stone-50 sm:text-4xl"
+        >
+          {personalBrand.origin.title}
+        </h2>
+        <div class="mt-7 space-y-5 text-pretty text-lg leading-8 text-stone-600 dark:text-stone-300">
+          {personalBrand.origin.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
+      </div>
+    </section>
+
+    <section
+      class="border-y border-stone-200 py-16 dark:border-white/[0.08] sm:py-20"
+      aria-labelledby="brand-ecosystem"
+    >
+      <div class="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.26em] text-stone-500 dark:text-stone-400">
+            {personalBrand.ecosystem.eyebrow}
+          </p>
+          <h2
+            id="brand-ecosystem"
+            class="mt-4 text-balance text-3xl font-semibold tracking-[-0.03em] text-stone-950 dark:text-stone-50 sm:text-4xl"
+          >
+            {personalBrand.ecosystem.title}
+          </h2>
+          <p class="mt-5 max-w-xl leading-7 text-stone-600 dark:text-stone-300">
+            {personalBrand.ecosystem.description}
+          </p>
+        </div>
+        <ul class="grid gap-x-8 sm:grid-cols-2">
+          {
+            personalBrand.ecosystem.channels.map((channel) => (
+              <li class="flex items-start justify-between gap-5 border-b border-stone-200 py-4 dark:border-white/[0.08]">
+                <div>
+                  <p class="font-semibold text-stone-900 dark:text-stone-100">{channel.label}</p>
+                  <p class="mt-1 text-xs leading-5 text-stone-500 dark:text-stone-400">{channel.purpose}</p>
+                </div>
+                <span
+                  class:list={[
+                    'shrink-0 text-[0.65rem] font-semibold uppercase tracking-[0.12em]',
+                    channel.status === 'Disponible'
+                      ? 'text-amber-800 dark:text-amber-300'
+                      : 'text-stone-400 dark:text-stone-500',
+                  ]}
+                >
+                  {channel.status}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="py-16 text-center sm:py-20" aria-labelledby="brand-reflections-cta">
+      <p class="text-xs font-semibold uppercase tracking-[0.26em] text-stone-500 dark:text-stone-400">
+        {personalBrand.reflectionsCta.eyebrow}
+      </p>
+      <h2
+        id="brand-reflections-cta"
+        class="mx-auto mt-4 max-w-3xl text-balance text-3xl font-semibold tracking-[-0.03em] text-stone-950 dark:text-stone-50 sm:text-4xl"
+      >
+        {personalBrand.reflectionsCta.title}
+      </h2>
+      <p class="mx-auto mt-5 max-w-2xl text-pretty leading-7 text-stone-600 dark:text-stone-300">
+        {personalBrand.reflectionsCta.description}
+      </p>
+      <a
+        href={personalBrand.reflectionsCta.href}
+        class="mt-8 inline-flex min-h-12 items-center justify-center rounded-full bg-stone-950 px-7 py-3 text-sm font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white"
+      >
+        {personalBrand.reflectionsCta.label}
+        <span aria-hidden="true" class="ml-2">→</span>
+      </a>
+    </section>
+  </div>
+</div>
