@@ -6,13 +6,21 @@ const columns = 'id, slug, published_at, image_url, quote, quote_author, title, 
 
 const mapRows = (rows: unknown) => (Array.isArray(rows) ? (rows as Reflection[]) : []);
 
-export async function getPublishedReflections(limit = 12): Promise<Reflection[]> {
-  const { data, error } = await createSupabaseServerClient()
+/**
+ * Devuelve únicamente contenido que ya puede descubrir el lector. El límite es opcional: Home y RSS conservan
+ * colecciones acotadas, mientras que la biblioteca puede solicitar el catálogo completo hasta que exista paginación.
+ */
+export async function getPublishedReflections(limit?: number): Promise<Reflection[]> {
+  let query = createSupabaseServerClient()
     .from('reflections')
     .select(columns)
     .eq('is_published', true)
-    .order('published_at', { ascending: false })
-    .limit(limit);
+    .lte('published_at', new Date().toISOString())
+    .order('published_at', { ascending: false });
+
+  if (limit !== undefined) query = query.limit(limit);
+
+  const { data, error } = await query;
   if (error) throw error;
   return mapRows(data);
 }

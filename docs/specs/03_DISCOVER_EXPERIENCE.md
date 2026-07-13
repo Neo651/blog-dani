@@ -1,42 +1,44 @@
-# Discover Experience
+# Feature 03 — Discover Experience
 
 Versión: 1.0
 
-Estado: Pendiente
+Estado: Completada
 
-Prioridad: 🟠 Alta
+Fecha de cierre: 2026-07-13
+
+Prioridad: 🔴 Alta
 
 ---
 
 # Objetivo
 
-Facilitar que el lector descubra nuevas reflexiones de forma natural, sin sentirse perdido ni abrumado.
+Convertir la biblioteca de reflexiones en una experiencia de descubrimiento que invite al usuario a seguir leyendo una reflexión tras otra.
 
-La exploración debe sentirse intuitiva, agradable y fluida.
+La página /reflexiones no debe sentirse como un listado de artículos.
 
-El objetivo no es generar más clics.
+Debe sentirse como una biblioteca editorial cuidadosamente curada.
 
-El objetivo es ayudar al lector a encontrar la siguiente reflexión que más valor pueda aportarle.
+El visitante debe querer permanecer varios minutos explorando.
 
 ---
 
 # Problema actual
 
-Actualmente el usuario puede leer una reflexión, pero la exploración del contenido es limitada.
+Actualmente las reflexiones pueden visualizarse correctamente, pero la experiencia de descubrimiento todavía es limitada.
 
 Problemas detectados:
 
-• La Home muestra pocas oportunidades para descubrir contenido.
+• La navegación entre reflexiones no genera curiosidad.
 
-• No existe una biblioteca dedicada.
+• El usuario no percibe una continuidad natural.
 
-• No existe buscador.
+• No existe una jerarquía editorial clara.
 
-• No existe orden por popularidad.
+• El listado se siente demasiado funcional.
 
-• No existen recomendaciones inteligentes.
+• No existen estados vacíos elegantes.
 
-• El usuario puede abandonar el sitio después de una sola lectura.
+• El usuario no tiene sensación de progreso al explorar.
 
 ---
 
@@ -44,257 +46,266 @@ Problemas detectados:
 
 El usuario quiere:
 
-Encontrar fácilmente otra reflexión.
+Encontrar rápidamente una reflexión interesante.
 
-Buscar un tema específico.
+Explorar sin sentirse perdido.
 
-Explorar el contenido sin esfuerzo.
+Descubrir contenido relacionado.
 
-Sentir que siempre hay algo interesante por descubrir.
+Poder volver más adelante.
 
----
-
-# Filosofía
-
-La exploración debe parecer una conversación.
-
-No un catálogo.
-
-No un buscador técnico.
-
-No un portal de noticias.
-
-Debe invitar a seguir leyendo con calma.
+Sentir que siempre existe algo nuevo por leer.
 
 ---
 
-# User Journey
+# Objetivos UX
 
-Home
+La experiencia debe transmitir:
 
-↓
+calma
 
-Reflexión destacada
+curiosidad
 
-↓
+orden
 
-Reflexiones recientes
+claridad
 
-↓
+fluidez
 
-Ver todas las reflexiones
+profundidad
 
-↓
+Nunca debe sentirse:
 
-Buscar
+como un archivo
 
-↓
+como una tabla
 
-Explorar
-
-↓
-
-Abrir otra reflexión
-
-↓
-
-Continuar leyendo
+como un blog antiguo
 
 ---
 
-# Biblioteca
+# Objetivos UI
 
-Crear una página dedicada:
+Gran protagonismo para las imágenes.
 
-/reflexiones
+Excelente jerarquía visual.
 
-Esta será la biblioteca principal del sitio.
+Espacios amplios.
 
-No reemplaza la Home.
+Tarjetas consistentes.
 
-La Home inspira.
+Excelente ritmo vertical.
 
-La biblioteca organiza.
+Mucho aire.
+
+Nada debe sentirse saturado.
 
 ---
 
-# Buscador
+# Hero de la biblioteca
 
-Agregar un buscador simple.
+Mostrar un encabezado editorial.
 
-Debe buscar por:
+Ejemplo conceptual:
 
-Título
+Reflexiones
 
-Frase
+Un espacio para detenerse unos minutos,
+pensar con calma y seguir creciendo.
 
-Contenido
+No utilizar un Hero gigante.
 
-(No implementar IA todavía.)
+Debe introducir la experiencia y desaparecer rápidamente para dar protagonismo al contenido.
 
-Debe responder rápidamente.
+---
+
+# Grid de reflexiones
+
+Mostrar todas las reflexiones publicadas.
+
+Cada tarjeta debe contener:
+
+Imagen.
+
+Fecha.
+
+Tiempo de lectura.
+
+Título.
+
+Frase destacada.
+
+Likes.
+
+Comentarios.
+
+Acción compartir.
+
+Botón:
+
+Leer reflexión.
+
+Toda la tarjeta debe ser clickeable.
 
 ---
 
 # Orden
 
-Permitir ordenar por:
+Mostrar primero las más recientes.
 
-Más recientes
+Nunca mostrar borradores.
 
-Más populares
-
-Más comentadas
-
-Más leídas (cuando exista esa métrica)
+Nunca mostrar publicaciones futuras.
 
 ---
 
-# Tarjetas
+# Compartir
 
-Cada reflexión mostrará:
+Mantener exactamente el mismo sistema implementado en:
 
-Imagen
+Landing.
 
-Fecha
+Reading Experience.
 
-Tiempo de lectura
+No crear una tercera versión.
 
-Título
-
-Frase destacada
-
-Likes
-
-Comentarios
-
-Botón:
-
-Leer reflexión
-
-Las tarjetas deben ser limpias y consistentes.
+Debe reutilizarse el mismo componente.
 
 ---
 
-# Cargar más
+# Estados vacíos
 
-Si existen muchas reflexiones:
+Si todavía no existen reflexiones:
 
-Preferir:
+Mostrar un estado elegante.
 
-"Cargar más"
+Ejemplo conceptual:
 
-Antes que una paginación clásica.
+"Nuevas reflexiones están en camino."
 
-El objetivo es mantener una navegación continua.
-
----
-
-# Recomendaciones
-
-En la Home mostrar:
-
-Las tres reflexiones más recientes.
-
-En la página individual mostrar:
-
-Tres reflexiones relacionadas.
-
-No repetir la reflexión actual.
+No mostrar páginas vacías.
 
 ---
 
-# Vacíos
+# Navegación
 
-Si aún existen pocas reflexiones:
+Permitir volver fácilmente a:
 
-Mostrar únicamente las disponibles.
+Inicio.
 
-Nunca mostrar tarjetas vacías.
+Última reflexión.
+
+Sobre Daniel.
+
+No obligar al usuario a usar el botón atrás del navegador.
+
+---
+
+# Continuidad
+
+Cada tarjeta debe invitar a continuar leyendo.
+
+No solamente listar contenido.
+
+La biblioteca debe sentirse como capítulos de un mismo libro.
 
 ---
 
 # Responsive
 
-La experiencia móvil debe ser igual de sencilla.
+Desktop.
 
-El buscador debe seguir siendo cómodo.
+Laptop.
 
-Las tarjetas deben reorganizarse automáticamente.
+Tablet.
+
+Móvil.
+
+La experiencia debe mantenerse consistente.
+
+No ocultar información importante.
 
 ---
 
 # Accesibilidad
 
-Todo el contenido debe ser navegable mediante teclado.
+Contraste AA.
 
-Los filtros deben ser comprensibles para lectores de pantalla.
+Focus visible.
+
+Navegación por teclado.
+
+Texto alternativo.
+
+Orden lógico del DOM.
 
 ---
 
 # SEO
 
-La página /reflexiones debe:
+Mantener:
 
-Indexarse correctamente.
+Title.
 
-Tener metadata propia.
+Description.
 
-Tener canonical.
+Canonical.
 
-Mantener excelente rendimiento.
+Open Graph.
+
+Twitter Cards.
+
+Structured Data cuando aporte valor.
 
 ---
 
 # Rendimiento
 
-No cargar todas las reflexiones si no es necesario.
+Lazy loading de imágenes.
 
-Preparar la arquitectura para:
+No cargar imágenes fuera del viewport.
 
-Paginación.
+Mantener excelente Lighthouse.
 
-Infinite Scroll.
-
-Carga incremental.
-
-Sin modificar la experiencia del usuario.
+No agregar librerías innecesarias.
 
 ---
 
 # Fuera de alcance
 
-No implementar:
+No implementar todavía:
+
+Buscador.
 
 Categorías.
 
 Etiquetas.
 
-IA.
+Favoritos.
 
 Colecciones.
 
-Favoritos.
+Filtros.
 
-Recomendaciones personalizadas.
+Eso pertenece a futuras Features.
 
-Todo eso pertenece a futuras versiones.
+La arquitectura debe quedar preparada para soportarlas sin reescribir componentes.
 
 ---
 
 # Componentes afectados
 
-ReflectionPreviewCard
+ReflectionsPage
 
-ReflectionGrid
+ReflectionCard
 
-SearchBar
+ShareActions
 
-SortSelector
+Navigation
 
-LoadMoreButton
+Header
 
-ReflectionList
+Footer
 
 ---
 
@@ -304,43 +315,68 @@ src/pages/reflexiones/index.astro
 
 src/components/reflections/
 
-src/features/reflections/
+src/components/social/
+
+src/components/navigation/
 
 ---
 
 # Checklist
 
-□ Página /reflexiones
+✅ Hero editorial
 
-□ Buscador
+✅ Grid consistente
 
-□ Ordenar
+✅ Compartir reutilizado
 
-□ Tarjetas
+✅ Likes
 
-□ Cargar más
+✅ Comentarios
 
-□ Responsive
+✅ Responsive
 
-□ SEO
+✅ Estados vacíos
 
-□ Excelente rendimiento
+✅ Navegación
+
+✅ SEO
+
+✅ Rendimiento
+
+---
+
+# Implementación cerrada
+
+La biblioteca obtiene todas las reflexiones vigentes desde el servicio canónico, ordenadas por fecha descendente y sin
+mostrar borradores ni publicaciones futuras.
+
+Las tarjetas reutilizan `ReflectionCard` y el sistema compartido de Landing y Reading Experience. La superficie completa
+es clicable solo en Discover mediante una capacidad optativa que mantiene separados los enlaces y botones accesibles.
+
+Likes y comentarios aprobados se solicitan mediante sus servicios existentes. Si las métricas fallan, la biblioteca
+mantiene disponible el contenido y oculta únicamente esa información secundaria.
+
+El encabezado editorial, la navegación contextual, el contador, el grid y los estados de error o catálogo vacío se
+renderizan en SSR. No se incorporó JavaScript de interfaz adicional ni dependencias.
+
+La estructura acepta una colección de reflexiones independiente de su origen de navegación; buscador, filtros o
+paginación podrán sustituir esa colección en una Feature futura sin modificar `ReflectionCard`.
 
 ---
 
 # Criterios de aceptación
 
-La Feature estará terminada cuando:
+La Feature se considerará terminada cuando:
 
-Un usuario pueda descubrir cualquier reflexión en pocos segundos.
+El usuario pueda descubrir nuevas reflexiones de forma natural.
 
-La navegación sea intuitiva.
+La biblioteca transmita calma y orden.
 
-La biblioteca escale correctamente a cientos de reflexiones.
+Las tarjetas mantengan consistencia visual con la Home.
 
-El buscador sea rápido.
+El usuario tenga varias formas naturales de continuar leyendo.
 
-La exploración resulte agradable y sin fricción.
+Toda la experiencia se perciba editorial y no como un simple listado.
 
 ---
 
@@ -348,32 +384,30 @@ La exploración resulte agradable y sin fricción.
 
 Medium
 
-Apple Books
-
-Kindle Library
-
 Read.cv
 
-Notion
+Apple Books
+
+Substack
 
 No copiar interfaces.
 
-Inspirarse en:
+Inspirarse únicamente en:
 
-claridad
+jerarquía
 
-exploración
+ritmo
 
 minimalismo
 
-velocidad
+claridad
+
+calidad editorial
 
 ---
 
 # Principio final
 
-El usuario nunca debe preguntarse:
+Una buena biblioteca no muestra simplemente contenido.
 
-"¿Qué puedo leer ahora?"
-
-La interfaz debe responder esa pregunta de forma natural antes de que el usuario tenga que hacerla.
+Invita silenciosamente a descubrir la siguiente idea.

@@ -19,6 +19,11 @@ Decisión de interacción
 Compartir vive junto a “Leer reflexión” y nunca depende del hover. El popover se eleva fuera de la tarjeta para que
 el recorte visual de la imagen no limite la navegación con ratón, teclado o dispositivo táctil.
 
+Cómo extenderlo
+`entireCardClickable` amplía el enlace del título únicamente cuando una superficie de descubrimiento lo necesita.
+La opción usa un enlace superpuesto y eleva las acciones independientes por encima. Así evita enlaces anidados y
+conserva sin cambios la interacción de Home y relacionadas.
+
 Autor: Daniel Montesinos
 ====================================================
 */
@@ -33,9 +38,10 @@ export interface Props {
   reflection: Reflection;
   likeCount?: number;
   commentCount?: number;
+  entireCardClickable?: boolean;
 }
 
-const { reflection, likeCount, commentCount } = Astro.props;
+const { reflection, likeCount, commentCount, entireCardClickable = false } = Astro.props;
 const href = `/reflexiones/${reflection.slug}`;
 const shareUrl = createReflectionShareUrl({
   slug: reflection.slug,
@@ -46,18 +52,43 @@ const shareUrl = createReflectionShareUrl({
 ---
 
 <article
-  class="group flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white transition duration-500 hover:-translate-y-1.5 hover:border-stone-300 hover:shadow-[0_28px_70px_-40px_rgba(28,25,23,0.5)] dark:border-stone-800 dark:bg-stone-900 dark:hover:border-stone-700"
+  class="group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white transition duration-500 hover:-translate-y-1.5 hover:border-stone-300 hover:shadow-[0_28px_70px_-40px_rgba(28,25,23,0.5)] dark:border-stone-800 dark:bg-stone-900 dark:hover:border-stone-700"
 >
-  <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-stone-100 dark:bg-stone-800">
-    <img
-      src={reflection.image_url}
-      alt=""
-      loading="lazy"
-      decoding="async"
-      class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
-    />
-  </a>
-  <div class="flex flex-1 flex-col p-6 sm:p-7">
+  {
+    entireCardClickable ? (
+      <div class="block overflow-hidden bg-stone-100 dark:bg-stone-800">
+        <img
+          src={reflection.image_url}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+        />
+      </div>
+    ) : (
+      <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-stone-100 dark:bg-stone-800">
+        <img
+          src={reflection.image_url}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+        />
+      </a>
+    )
+  }
+  {
+    entireCardClickable && (
+      <a
+        href={href}
+        class="absolute inset-0 z-[1] rounded-[1.75rem] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
+        aria-label={`Leer reflexión: ${reflection.title}`}
+      >
+        <span class="sr-only">Leer reflexión: {reflection.title}</span>
+      </a>
+    )
+  }
+  <div class:list={['flex flex-1 flex-col p-6 sm:p-7', entireCardClickable && 'pointer-events-none']}>
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-stone-500 dark:text-stone-400">
       <time datetime={reflection.published_at}>{formatReflectionDate(reflection.published_at)}</time><span
         aria-hidden="true">·</span
@@ -66,18 +97,25 @@ const shareUrl = createReflectionShareUrl({
     <h3
       class="mt-4 text-balance text-2xl font-semibold leading-tight tracking-[-0.025em] text-stone-950 dark:text-stone-50"
     >
-      <a
-        href={href}
-        class="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
-        >{reflection.title}</a
-      >
+      {
+        entireCardClickable ? (
+          reflection.title
+        ) : (
+          <a
+            href={href}
+            class="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
+          >
+            {reflection.title}
+          </a>
+        )
+      }
     </h3>
     <blockquote
       class="mt-4 border-l-2 border-amber-300 pl-4 text-sm italic leading-6 text-stone-600 dark:border-amber-700 dark:text-stone-300"
     >
       “{reflection.quote}”
     </blockquote>
-    <div class="mt-auto flex flex-wrap items-end gap-x-4 gap-y-3 pt-6">
+    <div class="relative z-10 mt-auto flex flex-wrap items-end gap-x-4 gap-y-3 pt-6">
       {
         (likeCount !== undefined || commentCount !== undefined) && (
           <p class="flex flex-1 flex-wrap gap-x-4 gap-y-1 pb-2 text-xs text-stone-500 dark:text-stone-400">
@@ -86,7 +124,7 @@ const shareUrl = createReflectionShareUrl({
           </p>
         )
       }
-      <div class="ml-auto flex items-center gap-2">
+      <div class="pointer-events-auto ml-auto flex items-center gap-2">
         <a
           href={href}
           class="inline-flex min-h-11 w-fit items-center border-b border-stone-300 py-2 text-sm font-semibold text-stone-900 transition duration-300 hover:border-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-100"

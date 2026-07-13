@@ -1,60 +1,199 @@
 ---
+/*
+====================================================
+Discover Experience
+
+Responsabilidad
+Orquestar en SSR la biblioteca editorial de todas las reflexiones publicadas y disponibles.
+
+Qué renderiza
+Una introducción breve, navegación contextual, contador editorial, grid accesible y estados de error o catálogo vacío.
+
+Datos que recibe
+Reflexiones, conexiones y comentarios obtenidos exclusivamente mediante los servicios existentes de cada dominio.
+
+Dependencias
+ReflectionCard, configuración pública, servicios de reflexiones, likes y comentarios, y PageLayout.
+
+Qué no debe hacer
+No consulta Supabase directamente, no implementa búsqueda, filtros, categorías, paginación ni modifica otras Features.
+
+Decisiones de arquitectura y evolución
+Las métricas se cargan en paralelo después del catálogo y pueden degradar sin ocultar contenido. El grid recibe una
+colección simple, por lo que buscador o paginación podrán cambiar la fuente de datos sin reescribir las tarjetas.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
 import ReflectionCard from '~/components/reflections/ReflectionCard.astro';
 import { siteConfig } from '~/config/site';
+import { getApprovedCommentCounts } from '~/features/comments/service';
+import { getLikeCounts } from '~/features/likes/service';
 import { getPublishedReflections } from '~/features/reflections/service';
 import type { Reflection } from '~/features/reflections/types';
 import Layout from '~/layouts/PageLayout.astro';
 
 let reflections: Reflection[] = [];
 let loadError = false;
+let engagementAvailable = true;
+let likeCounts = new Map<number, number>();
+let commentCounts = new Map<number, number>();
 
 try {
-  reflections = await getPublishedReflections(24);
+  reflections = await getPublishedReflections();
+
+  const reflectionIds = reflections.map(({ id }) => id);
+  if (reflectionIds.length) {
+    try {
+      [likeCounts, commentCounts] = await Promise.all([
+        getLikeCounts(reflectionIds),
+        getApprovedCommentCounts(reflectionIds),
+      ]);
+    } catch (error) {
+      // Las métricas enriquecen la decisión, pero una caída social nunca debe bloquear el acceso a las reflexiones.
+      console.warn('No se pudieron cargar las métricas de la biblioteca', error);
+      engagementAvailable = false;
+    }
+  }
 } catch (error) {
   console.error('No se pudo cargar la biblioteca de reflexiones', error);
   loadError = true;
 }
 
+const latestReflection = reflections[0];
+const reflectionCountLabel =
+  reflections.length === 1 ? '1 reflexión para explorar' : `${reflections.length} reflexiones para explorar`;
 const metadata = {
   title: 'Reflexiones',
-  description: `Todas las reflexiones de ${siteConfig.brand.name} para pensar con claridad y vivir con propósito.`,
+  description: `Explora todas las reflexiones de ${siteConfig.brand.name} para pensar con claridad, crecer con propósito y vivir mejor.`,
   canonical: `${siteConfig.brand.siteUrl}/reflexiones`,
+  openGraph: { type: 'website' },
+  twitter: { cardType: 'summary_large_image' },
 };
 ---
 
 <Layout metadata={metadata}>
-  <section class="px-5 py-20 sm:px-6 sm:py-28">
+  <div class="px-5 pb-20 pt-14 sm:px-6 sm:pb-28 sm:pt-18 lg:pt-20">
     <div class="mx-auto max-w-7xl">
-      <div class="max-w-3xl">
+      <header class="max-w-3xl">
         <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
-          Biblioteca
+          Biblioteca de ideas
         </p>
         <h1
-          class="mt-5 text-balance text-5xl font-semibold tracking-[-0.04em] text-stone-950 dark:text-stone-50 sm:text-6xl"
+          class="mt-4 text-balance text-5xl font-semibold tracking-[-0.04em] text-stone-950 dark:text-stone-50 sm:text-6xl"
         >
-          Reflexiones para volver a mirar.
+          Reflexiones
         </h1>
-        <p class="mt-6 max-w-2xl text-lg leading-8 text-stone-600 dark:text-stone-300">
-          Un lugar para explorar con calma las ideas que pueden ayudarte a pensar mejor y vivir con mayor propósito.
+        <p
+          class="mt-5 max-w-2xl text-pretty text-lg leading-8 text-stone-600 dark:text-stone-300 sm:text-xl sm:leading-9"
+        >
+          Un espacio para detenerte unos minutos, pensar con calma y descubrir una perspectiva que pueda acompañarte.
         </p>
-      </div>
+      </header>
+
+      <nav
+        aria-label="Continuar desde la biblioteca"
+        class="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-stone-200/80 py-4 text-sm dark:border-white/[0.08] sm:mt-11"
+      >
+        <a
+          href="/"
+          class="rounded-sm font-medium text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
+        >
+          ← Volver al inicio
+        </a>
+        {
+          latestReflection && (
+            <a
+              href={`/reflexiones/${latestReflection.slug}`}
+              class="rounded-sm font-semibold text-stone-900 transition hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-100 dark:hover:text-amber-300"
+            >
+              Leer la última reflexión
+            </a>
+          )
+        }
+        <a
+          href="/#sobre-daniel"
+          class="rounded-sm font-medium text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
+        >
+          Sobre Daniel
+        </a>
+      </nav>
+
       {
         loadError ? (
-          <div class="mt-14 rounded-3xl border border-red-200 bg-red-50 p-8 text-red-800 dark:border-red-950 dark:bg-red-950/20 dark:text-red-200">
-            No pudimos cargar las reflexiones. Inténtalo de nuevo más tarde.
-          </div>
+          <section
+            role="alert"
+            class="mt-14 max-w-3xl rounded-3xl border border-stone-200 bg-stone-50/70 px-7 py-9 dark:border-white/[0.08] dark:bg-white/[0.025] sm:px-9"
+          >
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500 dark:text-stone-400">
+              Pausa inesperada
+            </p>
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50">
+              No pudimos abrir la biblioteca.
+            </h2>
+            <p class="mt-3 max-w-xl leading-7 text-stone-600 dark:text-stone-300">
+              Inténtalo de nuevo en unos minutos. Las reflexiones seguirán aquí cuando regreses.
+            </p>
+          </section>
         ) : reflections.length ? (
-          <div class="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {reflections.map((reflection) => (
-              <ReflectionCard reflection={reflection} />
-            ))}
-          </div>
+          <section class="mt-12 sm:mt-14" aria-labelledby="library-heading">
+            <div class="flex items-end justify-between gap-6">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500 dark:text-stone-400">
+                  Para seguir pensando
+                </p>
+                <h2
+                  id="library-heading"
+                  class="mt-3 text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl"
+                >
+                  Elige la idea que hoy resuene contigo.
+                </h2>
+              </div>
+              <p class="hidden shrink-0 text-sm text-stone-500 dark:text-stone-400 sm:block">{reflectionCountLabel}</p>
+            </div>
+            <p class="mt-3 text-sm text-stone-500 dark:text-stone-400 sm:hidden">{reflectionCountLabel}</p>
+
+            <div class="mt-8 grid gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
+              {reflections.map((reflection) => (
+                <ReflectionCard
+                  reflection={reflection}
+                  likeCount={engagementAvailable ? (likeCounts.get(reflection.id) ?? 0) : undefined}
+                  commentCount={engagementAvailable ? (commentCounts.get(reflection.id) ?? 0) : undefined}
+                  entireCardClickable
+                />
+              ))}
+            </div>
+          </section>
         ) : (
-          <div class="mt-14 rounded-3xl border border-stone-200 p-10 text-center dark:border-stone-800">
-            La biblioteca está esperando su primera reflexión.
-          </div>
+          <section class="mx-auto mt-16 max-w-2xl text-center sm:mt-20" aria-labelledby="empty-library-heading">
+            <span
+              aria-hidden="true"
+              class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-amber-700/20 bg-amber-50 text-amber-800 dark:border-amber-500/20 dark:bg-amber-950/20 dark:text-amber-300"
+            >
+              ✦
+            </span>
+            <h2
+              id="empty-library-heading"
+              class="mt-6 text-3xl font-semibold tracking-tight text-stone-950 dark:text-stone-50"
+            >
+              Nuevas reflexiones están en camino.
+            </h2>
+            <p class="mx-auto mt-4 max-w-lg text-pretty leading-7 text-stone-600 dark:text-stone-300">
+              Las mejores ideas merecen tiempo. Mientras llega la primera, puedes conocer el propósito de este espacio.
+            </p>
+            <a
+              href="/#sobre-daniel"
+              class="mt-7 inline-flex min-h-11 items-center border-b border-stone-300 py-2 text-sm font-semibold text-stone-900 transition hover:border-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-100"
+            >
+              Conocer a Daniel{' '}
+              <span aria-hidden="true" class="ml-2">
+                →
+              </span>
+            </a>
+          </section>
         )
       }
     </div>
-  </section>
+  </div>
 </Layout>
