@@ -33,17 +33,19 @@ Autor: Daniel Montesinos
 
 export interface Props {
   reflectionId: number;
+  reflectionSlug?: string;
   returnTo: string;
   mode?: 'default' | 'reading';
 }
 
-const { reflectionId, returnTo, mode = 'default' } = Astro.props;
+const { reflectionId, reflectionSlug = '', returnTo, mode = 'default' } = Astro.props;
 const isReadingMode = mode === 'reading';
 ---
 
 <section
   data-comments-root
   data-reflection-id={reflectionId}
+  data-reflection-slug={reflectionSlug}
   data-return-to={returnTo}
   class:list={[
     'mx-auto border-t border-stone-200 px-1 dark:border-white/[0.07]',
@@ -88,6 +90,7 @@ const isReadingMode = mode === 'reading';
 <script>
   import { getCurrentUser, signInWithGoogle } from '~/features/auth/service';
   import { createComment, deleteComment, getApprovedComments, updateComment } from '~/features/comments/service';
+  import { trackEvent } from '~/features/analytics/client';
   import type { Comment } from '~/features/comments/types';
 
   const initialize = async (root: Element) => {
@@ -219,6 +222,11 @@ const isReadingMode = mode === 'reading';
         await createComment(reflectionId, textarea.value);
         textarea.value = '';
         notify('Comentario enviado. Aparecerá cuando sea aprobado.');
+        trackEvent('comment_submit', {
+          reflection_slug: root.dataset.reflectionSlug || '',
+          authenticated: true,
+          moderation_status: 'pending',
+        });
       } catch (error) {
         notify(error instanceof Error ? error.message : 'No se pudo publicar.', true);
       } finally {

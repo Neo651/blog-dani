@@ -113,3 +113,8 @@ const seoProps: SEOProps = {
 
 <SEO {...seoProps} />
 {author && <meta name="author" content={author} />}
+{
+  adaptedOg.type === 'article' && adaptedOg.publishedTime && (
+    <meta property="article:published_time" content={adaptedOg.publishedTime} />
+  )
+}

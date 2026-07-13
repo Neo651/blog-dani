@@ -1,0 +1,157 @@
+---
+/*
+====================================================
+ReadingAnalytics
+
+Responsabilidad
+Medir apertura, progreso y tiempo comprometido respecto al cuerpo editorial real.
+
+Datos que recibe
+Slug, título, fecha y tiempo esperado de una reflexión pública.
+
+Dependencias
+Cliente central de Analytics y APIs nativas del navegador.
+
+Qué no debe hacer
+No altera la lectura, no consulta Supabase, no mide el Hero como contenido y no envía texto editorial.
+
+Decisión de rendimiento
+El scroll es pasivo y se agrupa con requestAnimationFrame. El tiempo solo avanza con pestaña visible, foco y actividad
+reciente; los cuatro umbrales se emiten una vez y todos los listeners se limpian al navegar con ClientRouter.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  slug: string;
+  title: string;
+  publishedDate: string;
+  readingMinutes: number;
+}
+
+const { slug, title, publishedDate, readingMinutes } = Astro.props;
+---
+
+<span
+  data-reading-analytics
+  data-slug={slug}
+  data-title={title}
+  data-published-date={publishedDate}
+  data-reading-minutes={readingMinutes}
+  hidden></span>
+
+<script>
+  import { getReferrerType, resolveReflectionEntrySource, trackEvent } from '~/features/analytics/client';
+
+  declare global {
+    interface Window {
+      cleanupReadingAnalytics?: () => void;
+    }
+  }
+
+  const initializeReadingAnalytics = () => {
+    window.cleanupReadingAnalytics?.();
+    const marker = document.querySelector('[data-reading-analytics]');
+    const body = document.querySelector('[data-reading-body]');
+    if (!(marker instanceof HTMLElement) || !(body instanceof HTMLElement)) return;
+
+    const slug = marker.dataset.slug || '';
+    const title = marker.dataset.title || '';
+    const publishedDate = marker.dataset.publishedDate || '';
+    const readingMinutes = Number(marker.dataset.readingMinutes) || 1;
+    const expectedSeconds = readingMinutes * 60;
+    const minimumFinishSeconds = Math.min(30, Math.max(10, Math.round(expectedSeconds * 0.15)));
+    const controller = new AbortController();
+    const { signal } = controller;
+    const reached = new Set<number>();
+    let engagedSeconds = 0;
+    let lastActivity = Date.now();
+    let animationFrame = 0;
+    let finished = false;
+    let summarySent = false;
+
+    trackEvent('reflection_open', {
+      reflection_slug: slug,
+      reflection_title: title,
+      published_date: publishedDate.slice(0, 10),
+      reading_minutes: readingMinutes,
+      entry_source: resolveReflectionEntrySource(slug),
+      referrer_type: getReferrerType(),
+    });
+
+    const markActivity = () => {
+      lastActivity = Date.now();
+    };
+
+    const isEngaged = () =>
+      document.visibilityState === 'visible' && document.hasFocus() && Date.now() - lastActivity < 30_000;
+
+    const sendFinishWhenReady = () => {
+      if (finished || !reached.has(100) || engagedSeconds < minimumFinishSeconds) return;
+      finished = true;
+      trackEvent('reflection_finish', {
+        reflection_slug: slug,
+        expected_reading_minutes: readingMinutes,
+        engaged_seconds: engagedSeconds,
+        completion_method: 'article_end',
+      });
+    };
+
+    const measureProgress = () => {
+      const rectangle = body.getBoundingClientRect();
+      const travelled = window.innerHeight - rectangle.top;
+      const progress = Math.max(0, Math.min(100, Math.round((travelled / rectangle.height) * 100)));
+      [25, 50, 75, 100].forEach((threshold) => {
+        if (progress >= threshold && !reached.has(threshold)) {
+          reached.add(threshold);
+          trackEvent('reflection_scroll', {
+            reflection_slug: slug,
+            percent: threshold,
+            reading_minutes: readingMinutes,
+          });
+        }
+      });
+      sendFinishWhenReady();
+      animationFrame = 0;
+    };
+
+    const requestProgressMeasurement = () => {
+      markActivity();
+      if (!animationFrame) animationFrame = requestAnimationFrame(measureProgress);
+    };
+
+    const sendEngagementSummary = () => {
+      if (summarySent || engagedSeconds === 0) return;
+      summarySent = true;
+      trackEvent('reading_engagement', {
+        reflection_slug: slug,
+        engaged_seconds: engagedSeconds,
+        expected_seconds: expectedSeconds,
+        completion_ratio: Number(Math.min(1, engagedSeconds / expectedSeconds).toFixed(2)),
+      });
+    };
+
+    const timer = window.setInterval(() => {
+      if (isEngaged()) engagedSeconds += 5;
+      sendFinishWhenReady();
+    }, 5000);
+
+    window.addEventListener('scroll', requestProgressMeasurement, { passive: true, signal });
+    window.addEventListener('pointerdown', markActivity, { passive: true, signal });
+    window.addEventListener('keydown', markActivity, { signal });
+    window.addEventListener('pagehide', sendEngagementSummary, { signal });
+    document.addEventListener('astro:before-preparation', sendEngagementSummary, { signal });
+    measureProgress();
+
+    window.cleanupReadingAnalytics = () => {
+      sendEngagementSummary();
+      controller.abort();
+      window.clearInterval(timer);
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+    };
+  };
+
+  // Astro emite este evento también en la carga inicial; usar una sola entrada evita duplicar reflection_open.
+  document.addEventListener('astro:page-load', initializeReadingAnalytics);
+</script>

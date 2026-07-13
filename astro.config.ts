@@ -29,7 +29,13 @@ export default defineConfig({
   adapter: cloudflare({ imageService: 'compile' }),
 
   integrations: [
-    sitemap(),
+    sitemap({
+      // El sitemap estático nunca debe anunciar superficies privadas aunque sus páginas SSR existan en el build.
+      filter: (page) => {
+        const pathname = new URL(page).pathname;
+        return pathname !== '/admin' && !pathname.startsWith('/admin/') && !pathname.startsWith('/auth/');
+      },
+    }),
     mdx(),
     icon({
       include: {

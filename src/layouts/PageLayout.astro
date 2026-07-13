@@ -7,9 +7,10 @@ import type { MetaData } from '~/types';
 
 export interface Props {
   metadata?: MetaData;
+  footerVariant?: 'default' | 'compact';
 }
 
-const { metadata } = Astro.props;
+const { metadata, footerVariant = 'default' } = Astro.props;
 ---
 
 <Layout metadata={metadata}>
@@ -18,6 +19,13 @@ const { metadata } = Astro.props;
   </slot>
   <main><slot /></main>
   <slot name="footer">
-    <SiteFooter brand={siteConfig.brand} footer={siteConfig.footer} />
+    <SiteFooter
+      brand={siteConfig.brand}
+      footer={siteConfig.footer}
+      navigation={siteConfig.navigation}
+      social={siteConfig.social}
+      currentPath={Astro.url.pathname}
+      variant={footerVariant}
+    />
   </slot>
 </Layout>

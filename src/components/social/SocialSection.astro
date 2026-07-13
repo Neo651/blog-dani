@@ -68,6 +68,9 @@ const visibleSocialLinks = isLanding ? social.links.filter((link) => link.priori
             {link.available && link.href ? (
               <a
                 href={link.href}
+                data-analytics-cta={
+                  link.label === 'LinkedIn' ? 'linkedin' : link.label === 'Correo' ? 'correo' : undefined
+                }
                 target={link.external ? '_blank' : undefined}
                 rel={link.external ? 'noopener noreferrer' : undefined}
                 class="group flex h-full min-h-24 flex-col rounded-xl border border-stone-200/80 bg-white/55 p-3.5 text-stone-800 transition duration-300 hover:border-amber-300 hover:bg-amber-50/40 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-600 dark:border-white/[0.065] dark:bg-white/[0.018] dark:text-stone-200 dark:hover:border-amber-800/60 dark:hover:bg-amber-950/10"

@@ -70,6 +70,7 @@ export interface MetaDataOpenGraph {
   images?: Array<MetaDataImage>;
   locale?: string;
   type?: string;
+  publishedTime?: string;
 }
 
 export interface MetaDataTwitter {

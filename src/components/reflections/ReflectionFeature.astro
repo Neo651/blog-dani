@@ -30,7 +30,7 @@ import LikeButton from '~/components/social/LikeButton.astro';
 import ShareActions from '~/components/social/ShareActions.astro';
 import type { SiteConfig } from '~/config/site';
 import type { Reflection } from '~/features/reflections/types';
-import { formatReflectionDate } from '~/utils/reflections';
+import { formatReflectionDate, isEditorialSectionLabel } from '~/utils/reflections';
 import { createReflectionShareUrl } from '~/utils/share';
 
 export interface Props {
@@ -60,6 +60,8 @@ const paragraphs = reflection.body
     <img
       src={reflection.image_url}
       alt={reflection.title}
+      width="1600"
+      height="1000"
       fetchpriority="high"
       decoding="async"
       class="absolute inset-0 h-full w-full object-cover"
@@ -98,11 +100,21 @@ const paragraphs = reflection.body
         >{reflection.title}</Heading
       >
       <div class="mt-8 space-y-6 text-lg leading-8 text-stone-700 dark:text-stone-300 sm:text-xl sm:leading-9">
-        {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        {
+          paragraphs.map((paragraph) =>
+            isEditorialSectionLabel(paragraph) ? (
+              <h3 class="pt-3 text-xs font-semibold uppercase tracking-[0.22em] text-amber-800 dark:text-amber-300">
+                {paragraph.replace(/:$/, '')}
+              </h3>
+            ) : (
+              <p>{paragraph}</p>
+            )
+          )
+        }
       </div>
       <!-- La línea funciona como una pausa breve, no como una ruptura entre lectura y respuesta. -->
       <div class="mt-6 border-t border-stone-200 pt-5 dark:border-stone-800 sm:mt-7 sm:pt-6">
-        <LikeButton reflectionId={reflection.id} />
+        <LikeButton reflectionId={reflection.id} reflectionSlug={reflection.slug} />
       </div>
     </div>
   </div>

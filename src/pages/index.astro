@@ -18,6 +18,16 @@ const metadata = {
   description: siteConfig.brand.description,
   canonical: siteConfig.brand.siteUrl,
 };
+const websiteStructuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: siteConfig.brand.name,
+  url: siteConfig.brand.siteUrl,
+  description: siteConfig.brand.description,
+  inLanguage: 'es-PE',
+  author: { '@type': 'Person', name: siteConfig.brand.name, url: `${siteConfig.brand.siteUrl}/sobre-mi` },
+};
+const websiteStructuredDataJson = JSON.stringify(websiteStructuredData).replace(/</g, '\\u003c');
 
 let reflections: Reflection[] = [];
 let loadError = false;
@@ -49,6 +59,7 @@ const previous = reflections.slice(1, 4);
 ---
 
 <Layout metadata={metadata}>
+  <script type="application/ld+json" is:inline set:html={websiteStructuredDataJson} />
   <div class="landing-surface">
     <HeroSection hero={siteConfig.hero} />
 
@@ -70,7 +81,7 @@ const previous = reflections.slice(1, 4);
               </h2>
             </div>
             <ReflectionFeature reflection={latest} brand={siteConfig.brand} headingLevel="h2" />
-            <CommentsSection reflectionId={latest.id} returnTo="/" />
+            <CommentsSection reflectionId={latest.id} reflectionSlug={latest.slug} returnTo="/" />
           </section>
         ) : (
           <section class="mx-auto mb-24 max-w-3xl rounded-3xl border border-stone-200 p-10 text-center dark:border-stone-800">
@@ -107,6 +118,7 @@ const previous = reflections.slice(1, 4);
                 <div class="landing-section-reveal">
                   <ReflectionCard
                     reflection={reflection}
+                    entrySource="home_previous"
                     likeCount={engagementAvailable ? (likeCounts.get(reflection.id) ?? 0) : undefined}
                     commentCount={engagementAvailable ? (commentCounts.get(reflection.id) ?? 0) : undefined}
                   />
@@ -130,6 +142,7 @@ const previous = reflections.slice(1, 4);
         <div class="mt-10 text-center">
           <a
             href="/reflexiones"
+            data-analytics-cta="ver_todas_reflexiones"
             class="inline-flex min-h-12 items-center justify-center rounded-full border border-stone-300 bg-white px-7 py-3 font-semibold text-stone-900 transition duration-300 hover:-translate-y-0.5 hover:border-stone-500 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:border-stone-500"
           >
             Ver todas las reflexiones<span aria-hidden="true" class="ml-2">→</span>

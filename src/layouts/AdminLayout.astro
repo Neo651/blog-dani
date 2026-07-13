@@ -1,18 +1,50 @@
 ---
+/*
+====================================================
+AdminLayout
+
+Responsabilidad
+Proporcionar el marco privado y mínimo del panel administrativo.
+
+Qué renderiza
+Metadata no indexable, acceso de retorno al sitio y el contenido del Admin.
+
+Dependencias
+Layout global y configuración pública de marca.
+
+Qué no debe hacer
+No autentica, no consulta Supabase y no comparte la navegación editorial pública.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
 import Layout from '~/layouts/Layout.astro';
 import { siteConfig } from '~/config/site';
 import type { MetaData } from '~/types';
+
 export interface Props {
   metadata?: MetaData;
 }
+
 const { metadata } = Astro.props;
 ---
 
 <Layout metadata={metadata}>
-  <header class="border-b border-gray-200 dark:border-gray-800">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-      <a href="/" class="font-bold">{siteConfig.brand.name}</a>
-      <a href="/" class="text-sm text-gray-500">Ver sitio</a>
+  <header class="border-b border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-950">
+    <div class="mx-auto flex min-h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <a
+        href="/"
+        class="rounded-sm font-semibold tracking-tight focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
+      >
+        {siteConfig.brand.name}
+      </a>
+      <a
+        href="/"
+        class="inline-flex min-h-11 items-center rounded-sm text-sm font-medium text-stone-500 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:hover:text-white"
+      >
+        Ver sitio
+      </a>
     </div>
   </header>
   <main><slot /></main>

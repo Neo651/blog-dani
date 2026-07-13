@@ -13,10 +13,10 @@ Datos que recibe
 El contenido body de una reflexión, sin resumirlo ni reescribirlo.
 
 Dependencias
-Ninguna dependencia de datos o de lógica de negocio.
+Utilidad editorial compartida para reconocer únicamente etiquetas completas y conocidas.
 
 Qué no debe hacer
-No interpreta Markdown, no inserta HTML y no modifica el texto almacenado.
+No interpreta Markdown, no inserta HTML, no infiere secciones libres y no modifica el texto almacenado.
 
 Decisión de seguridad y ritmo
 Astro escapa el texto por defecto. Supabase conserva los párrafos mediante saltos de línea simples; dividir exactamente
@@ -26,17 +26,35 @@ Autor: Daniel Montesinos
 ====================================================
 */
 
+import { isEditorialSectionLabel } from '~/utils/reflections';
+
 export interface Props {
   body: string;
 }
 
 const { body } = Astro.props;
-const paragraphs = body
+const blocks = body
   .split(/\r?\n/)
   .map((paragraph) => paragraph.trim())
-  .filter(Boolean);
+  .filter(Boolean)
+  .map((text) => ({ text, isEditorialLabel: isEditorialSectionLabel(text) }));
 ---
 
-<div class="reading-prose mx-auto max-w-[42rem]">
-  {paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+<div data-reading-body class="reading-prose mx-auto max-w-[42rem]">
+  {
+    blocks.map((block, index) =>
+      block.isEditorialLabel ? (
+        <h2
+          class:list={[
+            'text-xs font-semibold uppercase tracking-[0.22em] text-amber-800 dark:text-amber-300',
+            index === 0 ? 'mb-4' : 'mb-4 mt-10',
+          ]}
+        >
+          {block.text.replace(/:$/, '')}
+        </h2>
+      ) : (
+        <p>{block.text}</p>
+      )
+    )
+  }
 </div>

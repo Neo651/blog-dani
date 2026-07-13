@@ -10,8 +10,8 @@ export const siteConfig = {
     description: 'Reflexiones para pensar con claridad, crecer con propósito y vivir mejor.',
   },
   navigation: [
-    { label: 'Inicio', href: '/', homeHref: '#inicio' },
-    { label: 'Reflexiones', href: '/reflexiones', homeHref: '#ultimas-reflexiones' },
+    { label: 'Inicio', href: '/', homeHref: '/' },
+    { label: 'Reflexiones', href: '/reflexiones', homeHref: '/reflexiones' },
     { label: 'Sobre mí', href: '/sobre-mi', homeHref: '/sobre-mi' },
     { label: 'Contacto', href: '/#contacto', homeHref: '#contacto' },
   ],
@@ -78,6 +78,7 @@ export const siteConfig = {
       title: 'Cada canal tendrá un propósito.',
       description:
         'DanielMontesinos.com seguirá siendo el centro: el lugar para las reflexiones completas y la conversación con más profundidad.',
+      futureNote: 'Con el tiempo, este espacio podrá crecer hacia nuevos formatos.',
       channels: [
         { label: 'Blog', purpose: 'Reflexiones completas', status: 'Disponible' },
         { label: 'LinkedIn', purpose: 'Ideas profesionales y aprendizaje', status: 'Disponible' },

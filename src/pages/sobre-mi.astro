@@ -77,7 +77,7 @@ const personStructuredData = {
 const personStructuredDataJson = JSON.stringify(personStructuredData).replace(/</g, '\\u003c');
 ---
 
-<Layout metadata={metadata}>
+<Layout metadata={metadata} footerVariant="compact">
   <script type="application/ld+json" is:inline set:html={personStructuredDataJson} />
 
   <div class="personal-brand-experience">
@@ -104,22 +104,17 @@ const personStructuredDataJson = JSON.stringify(personStructuredData).replace(/<
           class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-stone-200/80 py-4 text-sm dark:border-white/[0.08]"
         >
           <a
-            href="/"
-            class="inline-flex min-h-11 items-center rounded-sm font-medium text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
-          >
-            ← Volver al inicio
-          </a>
-          <a
             href="/reflexiones"
-            class="inline-flex min-h-11 items-center rounded-sm font-semibold text-stone-900 transition hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-100 dark:hover:text-amber-300"
+            data-analytics-cta="explorar_reflexiones"
+            class="inline-flex min-h-11 items-center justify-center rounded-full bg-stone-950 px-5 py-2 font-semibold text-white transition hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white"
           >
             Explorar reflexiones
           </a>
           <a
-            href="#redes"
+            href="/"
             class="inline-flex min-h-11 items-center rounded-sm font-medium text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
           >
-            Sigamos conversando
+            ← Volver al inicio
           </a>
         </nav>
       </div>

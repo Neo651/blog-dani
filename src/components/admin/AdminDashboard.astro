@@ -1,115 +1,112 @@
-<div data-admin-root class="mx-auto max-w-6xl px-6 py-12">
-  <section data-login class="mx-auto max-w-md rounded-3xl border border-gray-200 p-8 dark:border-gray-800">
-    <h1 class="text-3xl font-bold">Administración</h1>
-    <p class="mt-2 text-gray-500">Inicia sesión con tu cuenta administradora.</p>
-    <form data-login-form class="mt-6 space-y-4">
-      <input
-        data-email
-        type="email"
-        required
-        autocomplete="email"
-        placeholder="Correo"
-        class="w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
-      />
-      <input
-        data-password
-        type="password"
-        required
-        autocomplete="current-password"
-        placeholder="Contraseña"
-        class="w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
-      />
-      <button class="w-full rounded-full bg-gray-950 px-5 py-3 font-semibold text-white dark:bg-white dark:text-black"
-        >Entrar</button
+---
+/*
+====================================================
+AdminDashboard
+
+Responsabilidad
+Orquestar autenticación, listado y edición de reflexiones dentro del único panel administrativo.
+
+Qué renderiza
+Acceso privado, métricas esenciales, listado CRUD y el editor editorial reutilizable.
+
+Datos que recibe
+No recibe datos SSR: la sesión protegida y los registros se obtienen mediante servicios de dominio en el navegador.
+
+Dependencias
+Servicios existentes de autenticación, reflexiones y almacenamiento; AdminReflectionEditor para la interfaz de edición.
+
+Qué no debe hacer
+No define políticas de autorización, no accede directamente a Supabase y no replica componentes del sitio público.
+
+Decisión de arquitectura
+El controlador conserva estado local porque el Admin es una única pantalla. Separar la vista del editor evita un
+componente monolítico sin introducir un framework cliente ni un segundo panel.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import AdminReflectionEditor from '~/components/admin/AdminReflectionEditor.astro';
+import { siteConfig } from '~/config/site';
+---
+
+<div data-admin-root class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
+  <section
+    data-login
+    class="mx-auto max-w-md rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-950 sm:p-8"
+  >
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400">Acceso privado</p>
+    <h1 class="mt-3 text-3xl font-semibold tracking-tight">Administración</h1>
+    <p class="mt-2 text-sm leading-6 text-stone-500">Inicia sesión con tu cuenta administradora.</p>
+    <form data-login-form class="mt-6 grid gap-4">
+      <div>
+        <label for="admin-email" class="text-sm font-semibold">Correo</label>
+        <input
+          id="admin-email"
+          data-email
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="tu@correo.com"
+          class="mt-2 h-12 w-full rounded-xl border border-stone-300 bg-white px-4 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900"
+        />
+      </div>
+      <div>
+        <label for="admin-password" class="text-sm font-semibold">Contraseña</label>
+        <input
+          id="admin-password"
+          data-password
+          type="password"
+          required
+          autocomplete="current-password"
+          placeholder="Tu contraseña"
+          class="mt-2 h-12 w-full rounded-xl border border-stone-300 bg-white px-4 outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900"
+        />
+      </div>
+      <button
+        data-login-submit
+        class="mt-2 min-h-12 rounded-full bg-stone-950 px-5 font-semibold text-white transition hover:bg-stone-800 disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:bg-white dark:text-stone-950"
       >
+        Entrar
+      </button>
     </form>
   </section>
 
   <section data-panel class="hidden">
-    <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p class="text-sm uppercase tracking-widest text-gray-500">Panel privado</p><h1 class="mt-2 text-4xl font-bold">
-          Reflexiones
-        </h1>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400">Panel privado</p>
+        <h1 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Reflexiones</h1>
+        <p class="mt-2 text-sm text-stone-500">Escribe, revisa y publica desde un único lugar.</p>
       </div>
-      <div class="flex gap-3">
+      <div class="flex flex-wrap gap-2">
         <button
           data-new
-          class="rounded-full bg-gray-950 px-5 py-3 font-semibold text-white dark:bg-white dark:text-black"
-          >Nueva reflexión</button
-        ><button data-logout class="rounded-full border border-gray-300 px-5 py-3">Salir</button>
+          class="min-h-11 rounded-full bg-stone-950 px-5 text-sm font-semibold text-white transition hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:bg-white dark:text-stone-950"
+        >
+          Nueva reflexión
+        </button>
+        <button
+          data-logout
+          class="min-h-11 rounded-full border border-stone-300 px-5 text-sm font-semibold transition hover:border-stone-500 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-stone-700"
+        >
+          Salir
+        </button>
       </div>
     </div>
-    <div data-stats class="mt-8 grid gap-4 sm:grid-cols-3"></div>
-    <div data-list class="mt-8 space-y-4"></div>
+    <div data-stats class="mt-8 grid gap-3 sm:grid-cols-3"></div>
+    <div data-list class="mt-8 grid gap-3"></div>
   </section>
 
-  <section data-editor class="hidden">
-    <button data-cancel type="button" class="mb-6 text-sm font-semibold">← Volver al listado</button>
-    <h1 data-editor-title class="text-4xl font-bold">Nueva reflexión</h1>
-    <form data-editor-form class="mt-8 grid gap-6 rounded-3xl border border-gray-200 p-8 dark:border-gray-800">
-      <input data-id type="hidden" />
-      <label
-        >Título<input
-          data-title
-          required
-          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
-        /></label
-      >
-      <label
-        >Slug<input
-          data-slug
-          required
-          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
-        /></label
-      >
-      <label
-        >Fecha de publicación<input
-          data-date
-          type="datetime-local"
-          required
-          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
-        /></label
-      >
-      <label
-        >Imagen<input
-          data-image
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          class="mt-2 block w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700"
-        /></label
-      >
-      <label
-        >Frase<textarea
-          data-quote
-          required
-          rows="3"
-          class="mt-2 w-full rounded-xl border border-gray-300 p-4 dark:border-gray-700 dark:bg-gray-900"
-        ></textarea></label
-      >
-      <label
-        >Autor de la frase<input
-          data-author
-          class="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 dark:border-gray-700 dark:bg-gray-900"
-        /></label
-      >
-      <label
-        >Desarrollo<textarea
-          data-body
-          required
-          rows="14"
-          class="mt-2 w-full rounded-xl border border-gray-300 p-4 dark:border-gray-700 dark:bg-gray-900"
-        ></textarea></label
-      >
-      <label class="flex items-center gap-3"><input data-published type="checkbox" /> Publicar ahora</label>
-      <button
-        data-save
-        class="rounded-full bg-gray-950 px-6 py-4 font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-black"
-        >Guardar reflexión</button
-      >
-    </form>
-  </section>
-  <p data-message class="mx-auto mt-6 hidden max-w-3xl rounded-xl p-4 text-center"></p>
+  <AdminReflectionEditor authorName={siteConfig.brand.name} />
+
+  <p
+    data-message
+    class="fixed inset-x-4 top-20 z-50 mx-auto hidden max-w-xl rounded-xl border px-4 py-3 text-center text-sm shadow-lg"
+    role="status"
+    aria-live="polite"
+  >
+  </p>
 </div>
 
 <script>
@@ -120,13 +117,16 @@
     deleteReflection,
     getAdminReflections,
     imagePathFromUrl,
+    isReflectionSlugAvailable,
     removeReflectionImage,
     updateReflection,
     uploadReflectionImage,
   } from '~/features/reflections/service';
   import type { Reflection, ReflectionInput } from '~/features/reflections/types';
+  import { calculateReadingMinutes, formatReflectionDate } from '~/utils/reflections';
 
   const root = document.querySelector('[data-admin-root]');
+
   if (root instanceof HTMLElement) {
     const select = <T extends Element>(name: string) => root.querySelector<T>(`[data-${name}]`);
     const login = select<HTMLElement>('login');
@@ -136,81 +136,198 @@
     const stats = select<HTMLElement>('stats');
     const message = select<HTMLElement>('message');
     const form = select<HTMLFormElement>('editor-form');
+    const previewDialog = select<HTMLDialogElement>('preview-dialog');
+    const imageInput = select<HTMLInputElement>('image');
+    const statusInput = select<HTMLSelectElement>('status');
+    const publishButton = select<HTMLButtonElement>('publish');
+    const defaultAuthor = editor?.dataset.defaultAuthor || 'Daniel Montesinos';
+
     let records: Reflection[] = [];
     let editing: Reflection | null = null;
+    let imageObjectUrl = '';
+    let imageWasRemoved = false;
+    let slugWasEditedManually = false;
+    let previewTrigger: HTMLElement | null = null;
+    let operationInProgress = false;
+
+    const value = (name: string) => select<HTMLInputElement | HTMLTextAreaElement>(name)?.value.trim() ?? '';
+
+    const setField = (name: string, fieldValue: string) => {
+      const element = select<HTMLInputElement | HTMLTextAreaElement>(name);
+      if (element) element.value = fieldValue;
+    };
 
     const notify = (text: string, isError = false) => {
       if (!message) return;
       message.textContent = text;
-      message.className = `mx-auto mt-6 max-w-3xl rounded-xl p-4 text-center ${isError ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`;
+      message.setAttribute('role', isError ? 'alert' : 'status');
+      message.className = `fixed inset-x-4 top-20 z-50 mx-auto max-w-xl rounded-xl border px-4 py-3 text-center text-sm shadow-lg ${
+        isError
+          ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200'
+          : 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'
+      }`;
     };
+
+    const hideMessage = () => message?.classList.add('hidden');
+
     const show = (section: 'login' | 'panel' | 'editor') => {
       login?.classList.toggle('hidden', section !== 'login');
       panel?.classList.toggle('hidden', section !== 'panel');
       editor?.classList.toggle('hidden', section !== 'editor');
+      if (section !== 'editor' && previewDialog?.open) previewDialog.close();
+      window.scrollTo({ top: 0, behavior: 'auto' });
     };
-    const value = (name: string) => select<HTMLInputElement | HTMLTextAreaElement>(name)?.value.trim() ?? '';
 
-    const render = () => {
+    const normalizeEditorialText = (text: string) =>
+      text
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLocaleLowerCase('es')
+        .replace(/[^a-z0-9]/g, '');
+
+    /**
+     * La comparación ignora mayúsculas, acentos, espacios y signos. Así una diferencia puramente visual no permite
+     * publicar dos textos que editorialmente siguen siendo idénticos.
+     */
+    const titleRepeatsQuote = () => {
+      const normalizedTitle = normalizeEditorialText(value('title'));
+      const normalizedQuote = normalizeEditorialText(value('quote'));
+      return Boolean(normalizedTitle && normalizedQuote && normalizedTitle === normalizedQuote);
+    };
+
+    const updateDerivedEditorState = () => {
+      const body = value('body');
+      const readingMinutes = calculateReadingMinutes(body);
+      const quoteLength = select<HTMLTextAreaElement>('quote')?.value.length ?? 0;
+      const repeated = titleRepeatsQuote();
+      const slug = value('slug');
+
+      const readingTime = select<HTMLElement>('reading-time');
+      if (readingTime) readingTime.textContent = `${readingMinutes} min de lectura estimada`;
+      const quoteCount = select<HTMLElement>('quote-count');
+      if (quoteCount) quoteCount.textContent = `${quoteLength} / 160 recomendado`;
+      select<HTMLElement>('repetition-warning')?.classList.toggle('hidden', !repeated);
+      const urlPreview = select<HTMLElement>('url-preview');
+      if (urlPreview) urlPreview.textContent = slug ? `${window.location.origin}/reflexiones/${slug}` : '';
+
+      if (publishButton) {
+        const willPublish = statusInput?.value === 'published';
+        publishButton.textContent = willPublish
+          ? editing?.is_published
+            ? 'Actualizar publicación'
+            : 'Publicar'
+          : editing
+            ? 'Actualizar borrador'
+            : 'Guardar reflexión';
+      }
+    };
+
+    const revokeImageObjectUrl = () => {
+      if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
+      imageObjectUrl = '';
+    };
+
+    const showImagePreview = (source: string, name: string, detail: string) => {
+      const preview = select<HTMLImageElement>('image-preview');
+      if (preview) preview.src = source;
+      const imageName = select<HTMLElement>('image-name');
+      if (imageName) imageName.textContent = name;
+      const imageSize = select<HTMLElement>('image-size');
+      if (imageSize) imageSize.textContent = detail;
+      select<HTMLElement>('image-empty')?.classList.add('hidden');
+      select<HTMLElement>('image-preview-container')?.classList.remove('hidden');
+    };
+
+    const clearImagePreview = () => {
+      const preview = select<HTMLImageElement>('image-preview');
+      if (preview) preview.removeAttribute('src');
+      select<HTMLElement>('image-empty')?.classList.remove('hidden');
+      select<HTMLElement>('image-preview-container')?.classList.add('hidden');
+    };
+
+    const formatFileSize = (bytes: number) => {
+      if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    };
+
+    const resetSelectedImage = () => {
+      revokeImageObjectUrl();
+      if (imageInput) imageInput.value = '';
+      imageWasRemoved = false;
+    };
+
+    const loadExistingImage = (record: Reflection | null) => {
+      resetSelectedImage();
+      if (record?.image_url) showImagePreview(record.image_url, 'Imagen actual', 'Guardada en la reflexión');
+      else clearImagePreview();
+    };
+
+    const renderDashboard = () => {
       if (stats) {
-        const published = records.filter((record) => record.is_published).length;
-        stats.innerHTML = '';
+        const publishedCount = records.filter((record) => record.is_published).length;
+        stats.replaceChildren();
         [
           ['Total', records.length],
-          ['Publicadas', published],
-          ['Borradores', records.length - published],
+          ['Publicadas', publishedCount],
+          ['Borradores', records.length - publishedCount],
         ].forEach(([label, amount]) => {
           const card = document.createElement('div');
-          card.className = 'rounded-2xl border border-gray-200 p-5 dark:border-gray-800';
+          card.className = 'rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950';
           const number = document.createElement('p');
-          number.className = 'text-3xl font-bold';
+          number.className = 'text-3xl font-semibold tracking-tight';
           number.textContent = String(amount);
           const text = document.createElement('p');
-          text.className = 'text-gray-500';
+          text.className = 'mt-1 text-sm text-stone-500';
           text.textContent = String(label);
           card.append(number, text);
           stats.append(card);
         });
       }
+
       if (!list) return;
       list.replaceChildren();
       records.forEach((record) => {
         const article = document.createElement('article');
         article.className =
-          'flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-gray-200 p-5 dark:border-gray-800';
-        const info = document.createElement('div');
+          'flex flex-col gap-4 rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950 sm:flex-row sm:items-center sm:justify-between';
+        const information = document.createElement('div');
+        information.className = 'min-w-0';
         const title = document.createElement('h2');
-        title.className = 'text-xl font-bold';
+        title.className = 'truncate text-lg font-semibold text-stone-950 dark:text-white';
         title.textContent = record.title;
         const status = document.createElement('p');
-        status.className = 'mt-1 text-sm text-gray-500';
-        status.textContent = record.is_published ? 'Publicada' : 'Borrador';
-        info.append(title, status);
+        status.className = 'mt-1 text-sm text-stone-500';
+        status.textContent = `${record.is_published ? 'Publicada' : 'Borrador'} · ${formatReflectionDate(record.published_at)}`;
+        information.append(title, status);
+
         const actions = document.createElement('div');
-        actions.className = 'flex gap-3';
+        actions.className = 'flex shrink-0 flex-wrap gap-2';
         const edit = document.createElement('button');
+        edit.type = 'button';
         edit.textContent = 'Editar';
-        edit.className = 'rounded-full border px-4 py-2';
+        edit.className =
+          'min-h-11 rounded-full border border-stone-300 px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-stone-700';
         edit.addEventListener('click', () => openEditor(record));
         const remove = document.createElement('button');
+        remove.type = 'button';
         remove.textContent = 'Eliminar';
-        remove.className = 'rounded-full border border-red-300 px-4 py-2 text-red-700';
-        remove.addEventListener('click', () => removeRecord(record));
+        remove.className =
+          'min-h-11 rounded-full px-4 text-sm font-semibold text-red-700 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-red-700 dark:text-red-300';
+        remove.addEventListener('click', () => removeRecord(record, remove));
         actions.append(edit, remove);
-        article.append(info, actions);
+        article.append(information, actions);
         list.append(article);
       });
     };
+
     const refresh = async () => {
       records = await getAdminReflections();
-      render();
+      renderDashboard();
     };
-    const setField = (name: string, value: string) => {
-      const element = select<HTMLInputElement | HTMLTextAreaElement>(name);
-      if (element) element.value = value;
-    };
+
     const openEditor = (record: Reflection | null = null) => {
       editing = record;
+      slugWasEditedManually = Boolean(record);
       form?.reset();
       setField('id', record ? String(record.id) : '');
       setField('title', record?.title ?? '');
@@ -222,14 +339,21 @@
       setField('quote', record?.quote ?? '');
       setField('author', record?.quote_author ?? '');
       setField('body', record?.body ?? '');
-      const published = select<HTMLInputElement>('published');
-      if (published) published.checked = record?.is_published ?? false;
+      if (statusInput) statusInput.value = record ? (record.is_published ? 'published' : 'draft') : 'published';
       const heading = select<HTMLElement>('editor-title');
       if (heading) heading.textContent = record ? 'Editar reflexión' : 'Nueva reflexión';
+      select<HTMLDetailsElement>('advanced')?.removeAttribute('open');
+      loadExistingImage(record);
+      hideMessage();
+      updateDerivedEditorState();
       show('editor');
+      select<HTMLInputElement>('title')?.focus();
     };
-    const removeRecord = async (record: Reflection) => {
+
+    const removeRecord = async (record: Reflection, button: HTMLButtonElement) => {
       if (!confirm(`¿Eliminar “${record.title}”? Esta acción no se puede deshacer.`)) return;
+      button.disabled = true;
+      button.textContent = 'Eliminando…';
       try {
         await deleteReflection(record.id);
         const path = imagePathFromUrl(record.image_url);
@@ -237,12 +361,158 @@
         await refresh();
         notify('Reflexión eliminada.');
       } catch (error) {
+        button.disabled = false;
+        button.textContent = 'Eliminar';
         notify(error instanceof Error ? error.message : 'No se pudo eliminar.', true);
       }
     };
 
+    const validateForm = async (willPublish: boolean) => {
+      if (!form?.reportValidity()) throw new Error('Revisa los campos obligatorios antes de continuar.');
+      const slug = value('slug');
+      if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+        select<HTMLDetailsElement>('advanced')?.setAttribute('open', '');
+        select<HTMLInputElement>('slug')?.focus();
+        throw new Error('La URL solo puede contener letras minúsculas, números y guiones entre palabras.');
+      }
+      if (willPublish && titleRepeatsQuote()) {
+        select<HTMLInputElement>('title')?.focus();
+        throw new Error('Diferencia el título del artículo y la frase de portada antes de publicar.');
+      }
+      const hasImage = Boolean(imageInput?.files?.[0] || (editing?.image_url && !imageWasRemoved));
+      if (willPublish && !hasImage) throw new Error('Selecciona una imagen principal antes de publicar.');
+      if (!(await isReflectionSlugAvailable(slug, editing?.id))) {
+        select<HTMLDetailsElement>('advanced')?.setAttribute('open', '');
+        select<HTMLInputElement>('slug')?.focus();
+        throw new Error('Esta URL ya pertenece a otra reflexión. Elige una diferente.');
+      }
+    };
+
+    const setEditorBusy = (busy: boolean, activeButton?: HTMLButtonElement) => {
+      operationInProgress = busy;
+      root
+        .querySelectorAll<HTMLButtonElement>('[data-save-draft], [data-preview], [data-publish]')
+        .forEach((button) => {
+          button.disabled = busy;
+        });
+      if (busy && activeButton) {
+        activeButton.dataset.restingLabel = activeButton.textContent ?? '';
+        activeButton.textContent = 'Guardando…';
+      }
+      if (!busy) {
+        root.querySelectorAll<HTMLButtonElement>('[data-resting-label]').forEach((button) => {
+          button.textContent = button.dataset.restingLabel ?? button.textContent;
+          delete button.dataset.restingLabel;
+        });
+        updateDerivedEditorState();
+      }
+    };
+
+    /**
+     * Primero valida y después sube. Si Supabase rechaza la escritura, elimina el archivo recién creado para no dejar
+     * residuos; la imagen anterior solo se borra después de confirmar que la reflexión fue guardada correctamente.
+     */
+    const saveReflection = async (willPublish: boolean, activeButton: HTMLButtonElement) => {
+      if (operationInProgress) return;
+      setEditorBusy(true, activeButton);
+      hideMessage();
+      let uploaded: { url: string; path: string } | null = null;
+      const wasEditing = Boolean(editing);
+      const previousImagePath = editing ? imagePathFromUrl(editing.image_url) : '';
+
+      try {
+        await validateForm(willPublish);
+        const image = imageInput?.files?.[0];
+        if (image) uploaded = await uploadReflectionImage(image);
+        const body = value('body');
+        const payload: ReflectionInput = {
+          slug: value('slug'),
+          title: value('title'),
+          body,
+          quote: value('quote'),
+          quote_author: value('author') || null,
+          image_url: uploaded?.url ?? (imageWasRemoved ? '' : (editing?.image_url ?? '')),
+          published_at: new Date(value('date')).toISOString(),
+          reading_minutes: calculateReadingMinutes(body),
+          is_published: willPublish,
+        };
+
+        if (editing) await updateReflection(editing.id, payload);
+        else await createReflection(payload);
+
+        if (previousImagePath && (uploaded || imageWasRemoved)) {
+          await removeReflectionImage(previousImagePath).catch(() => undefined);
+        }
+        await refresh();
+        resetSelectedImage();
+        show('panel');
+        notify(
+          willPublish
+            ? wasEditing
+              ? 'Publicación actualizada.'
+              : 'Reflexión publicada.'
+            : wasEditing
+              ? 'Borrador actualizado.'
+              : 'Borrador guardado.'
+        );
+      } catch (error) {
+        if (uploaded) await removeReflectionImage(uploaded.path).catch(() => undefined);
+        notify(error instanceof Error ? error.message : 'No se pudo guardar la reflexión.', true);
+      } finally {
+        setEditorBusy(false);
+      }
+    };
+
+    const renderPreview = () => {
+      if (!form?.reportValidity() || !previewDialog) return;
+      const previewImage = select<HTMLImageElement>('preview-image');
+      const selectedImage = imageInput?.files?.[0];
+      const previewSource = selectedImage ? imageObjectUrl : imageWasRemoved ? '' : (editing?.image_url ?? '');
+      if (previewImage) {
+        previewImage.classList.toggle('hidden', !previewSource);
+        if (previewSource) previewImage.src = previewSource;
+        else previewImage.removeAttribute('src');
+        previewImage.alt = previewSource ? `Imagen principal de ${value('title')}` : '';
+      }
+      const previewQuote = select<HTMLElement>('preview-quote');
+      if (previewQuote) previewQuote.textContent = value('quote');
+      const previewAuthor = select<HTMLElement>('preview-author');
+      if (previewAuthor) previewAuthor.textContent = `— ${value('author') || defaultAuthor}`;
+      const previewTitle = select<HTMLElement>('preview-title');
+      if (previewTitle) previewTitle.textContent = value('title');
+      const previewDate = select<HTMLTimeElement>('preview-date');
+      if (previewDate) {
+        previewDate.dateTime = new Date(value('date')).toISOString();
+        previewDate.textContent = formatReflectionDate(value('date'));
+      }
+      const previewTime = select<HTMLElement>('preview-time');
+      if (previewTime) previewTime.textContent = `${calculateReadingMinutes(value('body'))} min de lectura`;
+      const previewBody = select<HTMLElement>('preview-body');
+      if (previewBody) {
+        previewBody.replaceChildren();
+        value('body')
+          .split(/\r?\n/)
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+          .forEach((paragraph) => {
+            const element = document.createElement('p');
+            element.textContent = paragraph;
+            previewBody.append(element);
+          });
+      }
+      previewTrigger = select<HTMLButtonElement>('preview') ?? null;
+      previewDialog.showModal();
+      select<HTMLButtonElement>('close-preview')?.focus();
+    };
+
     select<HTMLFormElement>('login-form')?.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const button = select<HTMLButtonElement>('login-submit');
+      if (button) {
+        button.disabled = true;
+        button.textContent = 'Entrando…';
+      }
+      hideMessage();
       try {
         const user = await signInWithPassword(value('email'), value('password'));
         if (import.meta.env.PUBLIC_ADMIN_EMAIL && user?.email !== import.meta.env.PUBLIC_ADMIN_EMAIL) {
@@ -253,54 +523,67 @@
         show('panel');
       } catch (error) {
         notify(error instanceof Error ? error.message : 'No se pudo iniciar sesión.', true);
+      } finally {
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'Entrar';
+        }
       }
     });
+
     select<HTMLButtonElement>('logout')?.addEventListener('click', async () => {
       await signOut();
       show('login');
     });
     select<HTMLButtonElement>('new')?.addEventListener('click', () => openEditor());
-    select<HTMLButtonElement>('cancel')?.addEventListener('click', () => show('panel'));
-    select<HTMLInputElement>('title')?.addEventListener('input', () => {
-      if (!editing) setField('slug', createSlug(value('title')));
+    select<HTMLButtonElement>('cancel')?.addEventListener('click', () => {
+      resetSelectedImage();
+      show('panel');
     });
 
-    form?.addEventListener('submit', async (event) => {
+    select<HTMLInputElement>('title')?.addEventListener('input', () => {
+      if (!editing && !slugWasEditedManually) setField('slug', createSlug(value('title')));
+      updateDerivedEditorState();
+    });
+    select<HTMLInputElement>('slug')?.addEventListener('input', () => {
+      slugWasEditedManually = true;
+      updateDerivedEditorState();
+    });
+    select<HTMLTextAreaElement>('quote')?.addEventListener('input', updateDerivedEditorState);
+    select<HTMLTextAreaElement>('body')?.addEventListener('input', updateDerivedEditorState);
+    statusInput?.addEventListener('change', updateDerivedEditorState);
+
+    imageInput?.addEventListener('change', () => {
+      const file = imageInput.files?.[0];
+      if (!file) return;
+      revokeImageObjectUrl();
+      imageObjectUrl = URL.createObjectURL(file);
+      imageWasRemoved = false;
+      showImagePreview(imageObjectUrl, file.name, formatFileSize(file.size));
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-choose-image]').forEach((button) => {
+      button.addEventListener('click', () => imageInput?.click());
+    });
+    select<HTMLButtonElement>('remove-image')?.addEventListener('click', () => {
+      revokeImageObjectUrl();
+      if (imageInput) imageInput.value = '';
+      imageWasRemoved = true;
+      clearImagePreview();
+      root.querySelector<HTMLButtonElement>('[data-choose-image]')?.focus();
+    });
+
+    select<HTMLButtonElement>('save-draft')?.addEventListener('click', (event) => {
+      if (event.currentTarget instanceof HTMLButtonElement) void saveReflection(false, event.currentTarget);
+    });
+    form?.addEventListener('submit', (event) => {
       event.preventDefault();
-      const save = select<HTMLButtonElement>('save');
-      if (save) save.disabled = true;
-      const image = select<HTMLInputElement>('image')?.files?.[0];
-      let uploaded: { url: string; path: string } | null = null;
-      try {
-        if (!editing && !image) throw new Error('Selecciona una imagen.');
-        if (image) uploaded = await uploadReflectionImage(image);
-        const body = value('body');
-        const payload: ReflectionInput = {
-          slug: value('slug'),
-          title: value('title'),
-          body,
-          quote: value('quote'),
-          quote_author: value('author') || null,
-          image_url: uploaded?.url ?? editing?.image_url ?? '',
-          published_at: new Date(value('date')).toISOString(),
-          reading_minutes: Math.max(1, Math.ceil(body.split(/\s+/).length / 220)),
-          is_published: select<HTMLInputElement>('published')?.checked ?? false,
-        };
-        if (editing) await updateReflection(editing.id, payload);
-        else await createReflection(payload);
-        if (uploaded && editing) {
-          const oldPath = imagePathFromUrl(editing.image_url);
-          if (oldPath) await removeReflectionImage(oldPath).catch(() => undefined);
-        }
-        await refresh();
-        show('panel');
-        notify(editing ? 'Reflexión actualizada.' : 'Reflexión creada.');
-      } catch (error) {
-        if (uploaded) await removeReflectionImage(uploaded.path).catch(() => undefined);
-        notify(error instanceof Error ? error.message : 'No se pudo guardar.', true);
-      } finally {
-        if (save) save.disabled = false;
-      }
+      if (publishButton) void saveReflection(statusInput?.value === 'published', publishButton);
+    });
+    select<HTMLButtonElement>('preview')?.addEventListener('click', renderPreview);
+    select<HTMLButtonElement>('close-preview')?.addEventListener('click', () => previewDialog?.close());
+    previewDialog?.addEventListener('close', () => previewTrigger?.focus());
+    previewDialog?.addEventListener('click', (event) => {
+      if (event.target === previewDialog) previewDialog.close();
     });
 
     getCurrentUser()

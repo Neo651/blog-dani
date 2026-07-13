@@ -1,8 +1,10 @@
 # Navigation Experience
 
-Versión: 1.0
+Versión: 1.1
 
-Estado: Pendiente
+Estado: 🟡 Implementada — pendiente cierre de validación global
+
+Fecha de implementación: 13 de julio de 2026
 
 Prioridad: 🔴 Alta
 
@@ -120,7 +122,7 @@ Inicio
 
 Reflexiones
 
-Sobre Daniel
+Sobre mí
 
 Contacto
 
@@ -130,31 +132,21 @@ No agregar más opciones hasta que realmente sean necesarias.
 
 # Navegación en Home
 
-Los enlaces deben utilizar scroll suave.
-
 Inicio
 
-↓
-
-Hero
+llevará al inicio de la Home.
 
 Reflexiones
 
-↓
+abrirá /reflexiones.
 
-Últimas reflexiones
+Sobre mí
 
-Sobre Daniel
-
-↓
-
-About Section
+abrirá /sobre-mi.
 
 Contacto
 
-↓
-
-Footer
+hará scroll suave hacia la sección de contacto.
 
 ---
 
@@ -170,13 +162,15 @@ Reflexiones
 
 abrirá /reflexiones
 
-Sobre Daniel
+Sobre mí
 
-volverá a Home y desplazará automáticamente.
+abrirá /sobre-mi
 
 Contacto
 
-volverá al Footer.
+volverá a /#contacto
+
+La navegación debe funcionar de forma consistente desde cualquier ruta.
 
 ---
 
@@ -290,7 +284,7 @@ El menú móvil debe ser extremadamente simple.
 
 Evitar menús complejos.
 
-Máximo dos niveles.
+Un único nivel.
 
 ---
 
@@ -330,6 +324,29 @@ Mapa del sitio visual.
 
 ---
 
+# Validación de cierre
+
+- [x] El menú visible usa Inicio, Reflexiones, Sobre mí y Contacto.
+- [x] Los destinos son consistentes desde Home y desde rutas internas.
+- [x] No quedan enlaces activos hacia `#sobre-daniel`.
+- [x] Header sticky, discreto y con reducción sutil durante el scroll.
+- [x] Estado actual comunicado visualmente y mediante `aria-current`.
+- [x] Menú móvil de un único nivel, operable con teclado y cierre con Escape.
+- [x] Contacto conserva un ancla real de Home con offset seguro para el header.
+- [x] Footer ofrece navegación, canales activos y derechos sin enlaces ficticios.
+- [x] Las recomendaciones de lectura existentes se conservan sin anterior/siguiente.
+- [x] Validación responsive realizada en escritorio, tablet, móvil y 320 px.
+- [ ] Validaciones globales de formato completadas.
+
+Los enlaces legales se incorporarán cuando existan rutas y textos legales reales. Esta Feature evita destinos vacíos o
+documentos heredados de la demo que no representan el producto actual.
+
+La implementación y sus archivos pasan Astro Check, ESLint, Prettier, build y `git diff --check`. El cierre global queda
+pendiente porque `npm run check` detecta formato previo en `wrangler.jsonc` y el diff completo contiene espacios finales
+en `docs/specs/06_ADMIN_EXPERIENCE.md`; ambos archivos están fuera del alcance de esta Feature y no se modifican aquí.
+
+---
+
 # Componentes afectados
 
 Header
@@ -338,47 +355,41 @@ Navigation
 
 Footer
 
-Hero
-
-ReflectionCards
-
-AboutSection
-
-SocialSection
+Configuración pública de rutas
 
 ---
 
 # Archivos probablemente afectados
 
-src/components/layout/
-
 src/components/navigation/
 
-src/components/footer/
+src/config/site.ts
 
-src/pages/index.astro
+src/layouts/PageLayout.astro
+
+src/pages/reflexiones/
 
 ---
 
 # Checklist
 
-□ Menú simplificado
+- [x] Menú simplificado
 
-□ Scroll suave
+- [x] Scroll suave en anclas reales de Home
 
-□ Header sticky
+- [x] Header sticky
 
-□ Footer emocional
+- [x] Footer emocional
 
-□ CTA consistentes
+- [x] CTA consistentes
 
-□ Navegación intuitiva
+- [x] Navegación intuitiva
 
-□ Responsive
+- [x] Responsive
 
-□ Accesibilidad
+- [x] Accesibilidad
 
-□ Excelente rendimiento
+- [x] Excelente rendimiento
 
 ---
 

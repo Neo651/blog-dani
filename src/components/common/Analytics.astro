@@ -1,21 +1,35 @@
 ---
-import { ANALYTICS } from 'astrowind:config';
+/*
+====================================================
+Analytics
 
-const id = ANALYTICS?.vendors?.googleAnalytics?.id ? String(ANALYTICS.vendors.googleAnalytics.id) : '';
-const partytown = !!ANALYTICS?.vendors?.googleAnalytics?.partytown;
-const scriptType = partytown ? 'text/partytown' : undefined;
+Responsabilidad
+Cargar GA4 de forma opcional y conectar page views SSR/ClientRouter con la capa interna de producto.
+
+Dependencias
+PUBLIC_GA_MEASUREMENT_ID y cliente central de Analytics.
+
+Qué no debe hacer
+No carga scripts sin configuración, no registra rutas privadas y no bloquea el render.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+import AnalyticsClient from '~/components/analytics/AnalyticsClient.astro';
+
+const isPrivateRoute =
+  Astro.url.pathname === '/admin' ||
+  Astro.url.pathname.startsWith('/admin/') ||
+  Astro.url.pathname.startsWith('/auth/');
+const measurementId = isPrivateRoute ? '' : import.meta.env.PUBLIC_GA_MEASUREMENT_ID || '';
 ---
 
-{id && <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${id}`} type={scriptType} />}
-
-<script is:inline id="ga-init" data-id={id} type={id ? scriptType : undefined}>
-  if (document.getElementById('ga-init').dataset.id) {
-    var d = document.getElementById('ga-init').dataset.id;
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = function () {
-      dataLayer.push(arguments);
-    };
-    window.gtag('js', new Date());
-    window.gtag('config', d);
-  }
-</script>
+{
+  measurementId && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`} />
+      <AnalyticsClient measurementId={measurementId} />
+    </>
+  )
+}

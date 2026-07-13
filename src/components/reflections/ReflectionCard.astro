@@ -39,9 +39,10 @@ export interface Props {
   likeCount?: number;
   commentCount?: number;
   entireCardClickable?: boolean;
+  entrySource?: 'home_previous' | 'discover' | 'related';
 }
 
-const { reflection, likeCount, commentCount, entireCardClickable = false } = Astro.props;
+const { reflection, likeCount, commentCount, entireCardClickable = false, entrySource } = Astro.props;
 const href = `/reflexiones/${reflection.slug}`;
 const shareUrl = createReflectionShareUrl({
   slug: reflection.slug,
@@ -60,16 +61,26 @@ const shareUrl = createReflectionShareUrl({
         <img
           src={reflection.image_url}
           alt=""
+          width="800"
+          height="500"
           loading="lazy"
           decoding="async"
           class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
         />
       </div>
     ) : (
-      <a href={href} tabindex="-1" aria-hidden="true" class="block overflow-hidden bg-stone-100 dark:bg-stone-800">
+      <a
+        href={href}
+        data-reflection-source={entrySource}
+        tabindex="-1"
+        aria-hidden="true"
+        class="block overflow-hidden bg-stone-100 dark:bg-stone-800"
+      >
         <img
           src={reflection.image_url}
           alt=""
+          width="800"
+          height="500"
           loading="lazy"
           decoding="async"
           class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
@@ -81,6 +92,7 @@ const shareUrl = createReflectionShareUrl({
     entireCardClickable && (
       <a
         href={href}
+        data-reflection-source={entrySource}
         class="absolute inset-0 z-[1] rounded-[1.75rem] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
         aria-label={`Leer reflexión: ${reflection.title}`}
       >
@@ -103,6 +115,7 @@ const shareUrl = createReflectionShareUrl({
         ) : (
           <a
             href={href}
+            data-reflection-source={entrySource}
             class="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950"
           >
             {reflection.title}
@@ -127,6 +140,8 @@ const shareUrl = createReflectionShareUrl({
       <div class="pointer-events-auto ml-auto flex items-center gap-2">
         <a
           href={href}
+          data-reflection-source={entrySource}
+          data-analytics-cta="leer_reflexion"
           class="inline-flex min-h-11 w-fit items-center border-b border-stone-300 py-2 text-sm font-semibold text-stone-900 transition duration-300 hover:border-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-100"
         >
           Leer reflexión<span aria-hidden="true" class="ml-2 transition duration-300 group-hover:translate-x-1">→</span>

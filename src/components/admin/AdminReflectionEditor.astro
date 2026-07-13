@@ -1,0 +1,382 @@
+---
+/*
+====================================================
+AdminReflectionEditor
+
+Responsabilidad
+Presentar el formulario editorial y la vista previa local de una reflexión.
+
+Qué renderiza
+Los grupos Idea principal, Imagen, Contenido y Publicación, además de un diálogo accesible de preview.
+
+Datos que recibe
+El nombre público del autor, usado como atribución predeterminada cuando la cita es propia.
+
+Dependencias
+Solo recibe configuración pública; el controlador de AdminDashboard conecta estos campos con servicios y Supabase.
+
+Qué no debe hacer
+No autentica, no consulta datos, no sube imágenes y no decide permisos administrativos.
+
+Decisión de arquitectura
+La preview comparte el estado vivo del formulario mediante data attributes. No crea una segunda página ni persiste
+contenido temporal, por lo que permite revisar con fidelidad sin ampliar la superficie de seguridad del Admin.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  authorName: string;
+}
+
+const { authorName } = Astro.props;
+---
+
+<section data-editor class="hidden" data-default-author={authorName}>
+  <div class="mx-auto max-w-5xl">
+    <button
+      data-cancel
+      type="button"
+      class="mb-6 inline-flex min-h-11 items-center rounded-md text-sm font-semibold text-stone-600 transition hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:text-stone-300 dark:hover:text-white"
+    >
+      ← Volver al listado
+    </button>
+
+    <div class="max-w-2xl">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400">Editor</p>
+      <h1
+        data-editor-title
+        class="mt-3 text-3xl font-semibold tracking-tight text-stone-950 dark:text-white sm:text-4xl"
+      >
+        Nueva reflexión
+      </h1>
+      <p class="mt-3 text-sm leading-6 text-stone-500 dark:text-stone-400">
+        Organiza la idea, revisa cómo se sentirá al leerla y publícala cuando esté lista.
+      </p>
+    </div>
+
+    <form data-editor-form class="mt-8 grid gap-6" novalidate>
+      <input data-id type="hidden" />
+
+      <fieldset class="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950 sm:p-7">
+        <legend class="px-2 text-lg font-semibold text-stone-950 dark:text-white">1. Idea principal</legend>
+        <div class="mt-3 grid gap-5">
+          <div>
+            <label for="reflection-title" class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Título del artículo
+            </label>
+            <p id="reflection-title-help" class="mt-1 text-sm leading-5 text-stone-500 dark:text-stone-400">
+              Invita a descubrir la idea sin repetir exactamente la frase de portada.
+            </p>
+            <input
+              id="reflection-title"
+              data-title
+              required
+              aria-describedby="reflection-title-help editorial-repetition-warning"
+              placeholder="Ejemplo: Cómo dejar de vivir desde las heridas"
+              class="mt-2 h-12 w-full rounded-xl border border-stone-300 bg-white px-4 text-base text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900 dark:text-white"
+            />
+          </div>
+
+          <div>
+            <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+              <label for="reflection-quote" class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+                Frase destacada de la portada
+              </label>
+              <span data-quote-count class="shrink-0 text-xs text-stone-400">0 / 160 recomendado</span>
+            </div>
+            <p id="reflection-quote-help" class="mt-1 text-sm leading-5 text-stone-500 dark:text-stone-400">
+              Es la idea breve que aparecerá sobre la imagen y que las personas podrán recordar o compartir.
+            </p>
+            <textarea
+              id="reflection-quote"
+              data-quote
+              required
+              rows="4"
+              aria-describedby="reflection-quote-help editorial-repetition-warning"
+              placeholder="Ejemplo: No eres lo que te pasó. Eres lo que decides construir con ello."
+              class="mt-2 min-h-28 w-full resize-y rounded-xl border border-stone-300 bg-white p-4 text-base leading-6 text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900 dark:text-white"
+            ></textarea>
+          </div>
+
+          <div>
+            <label for="reflection-author" class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Autor de la cita <span class="font-normal text-stone-400">(opcional)</span>
+            </label>
+            <p id="reflection-author-help" class="mt-1 text-sm leading-5 text-stone-500 dark:text-stone-400">
+              Déjalo vacío si la frase es tuya. En ese caso se utilizará {authorName}.
+            </p>
+            <input
+              id="reflection-author"
+              data-author
+              aria-describedby="reflection-author-help"
+              placeholder="Ejemplo: Viktor Frankl"
+              class="mt-2 h-12 w-full rounded-xl border border-stone-300 bg-white px-4 text-base text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900 dark:text-white"
+            />
+          </div>
+
+          <p
+            id="editorial-repetition-warning"
+            data-repetition-warning
+            class="hidden rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm leading-5 text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+            role="status"
+          >
+            El título y la frase de portada expresan exactamente lo mismo. Puedes guardar el borrador, pero deberás
+            diferenciarlos antes de publicar.
+          </p>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950 sm:p-7">
+        <legend class="px-2 text-lg font-semibold text-stone-950 dark:text-white">2. Imagen principal</legend>
+        <p id="reflection-image-help" class="mt-3 text-sm leading-6 text-stone-500 dark:text-stone-400">
+          Usa una imagen horizontal limpia, sin texto, firma ni logotipos. El sitio colocará la frase mediante HTML.
+        </p>
+        <input
+          id="reflection-image"
+          data-image
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          aria-describedby="reflection-image-help"
+          class="sr-only"
+        />
+
+        <div
+          data-image-empty
+          class="mt-4 flex min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-stone-300 bg-stone-50 px-5 py-8 text-center dark:border-stone-700 dark:bg-stone-900/60"
+        >
+          <p class="text-sm font-medium text-stone-700 dark:text-stone-200">
+            La imagen se verá aquí antes de guardarla.
+          </p>
+          <p class="mt-1 text-xs text-stone-500">JPEG, PNG o WebP · preferiblemente 16:9</p>
+          <button
+            data-choose-image
+            type="button"
+            class="mt-4 inline-flex min-h-11 items-center rounded-full border border-stone-300 px-5 text-sm font-semibold text-stone-800 transition hover:border-stone-500 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-stone-700 dark:text-stone-100"
+          >
+            Seleccionar imagen
+          </button>
+        </div>
+
+        <div data-image-preview-container class="mt-4 hidden">
+          <div
+            class="overflow-hidden rounded-2xl border border-stone-200 bg-stone-100 dark:border-stone-800 dark:bg-stone-900"
+          >
+            <img
+              data-image-preview
+              src=""
+              alt="Vista previa de la imagen principal seleccionada"
+              class="aspect-video w-full object-cover"
+            />
+          </div>
+          <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="min-w-0 text-sm">
+              <p data-image-name class="truncate font-medium text-stone-800 dark:text-stone-100"></p>
+              <p data-image-size class="mt-0.5 text-xs text-stone-500"></p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                data-choose-image
+                type="button"
+                class="inline-flex min-h-11 items-center rounded-full border border-stone-300 px-4 text-sm font-semibold transition hover:border-stone-500 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-stone-700"
+              >
+                Cambiar imagen
+              </button>
+              <button
+                data-remove-image
+                type="button"
+                class="min-h-11 rounded-full px-4 text-sm font-semibold text-red-700 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-red-700 dark:text-red-300 dark:hover:bg-red-950/40"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950 sm:p-7">
+        <legend class="px-2 text-lg font-semibold text-stone-950 dark:text-white">3. Contenido</legend>
+        <label for="reflection-body" class="mt-3 block text-sm font-semibold text-stone-900 dark:text-stone-100">
+          Desarrollo de la reflexión
+        </label>
+        <p id="reflection-body-help" class="mt-1 text-sm leading-5 text-stone-500 dark:text-stone-400">
+          Escribe con calma. Utiliza párrafos breves y separa cada idea con una línea en blanco.
+        </p>
+        <textarea
+          id="reflection-body"
+          data-body
+          required
+          rows="16"
+          aria-describedby="reflection-body-help reflection-reading-time"
+          placeholder="Empieza a desarrollar aquí la idea que quieres compartir…"
+          class="mt-3 min-h-80 w-full resize-y rounded-xl border border-stone-300 bg-white p-4 text-base leading-7 text-stone-950 outline-none transition placeholder:text-stone-400 focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900 dark:text-white"
+        ></textarea>
+        <p id="reflection-reading-time" data-reading-time class="mt-2 text-xs text-stone-500">
+          1 min de lectura estimada
+        </p>
+      </fieldset>
+
+      <fieldset class="rounded-2xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-950 sm:p-7">
+        <legend class="px-2 text-lg font-semibold text-stone-950 dark:text-white">4. Publicación</legend>
+        <div class="mt-3 grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="reflection-status" class="text-sm font-semibold text-stone-900 dark:text-stone-100"
+              >Estado</label
+            >
+            <select
+              id="reflection-status"
+              data-status
+              class="mt-2 h-12 w-full rounded-xl border border-stone-300 bg-white px-4 text-base outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900"
+            >
+              <option value="draft">Borrador</option>
+              <option value="published">Publicada</option>
+            </select>
+          </div>
+          <div>
+            <label for="reflection-date" class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              Publicar el
+            </label>
+            <p id="reflection-date-help" class="mt-1 text-xs leading-5 text-stone-500">
+              Puedes publicar ahora o programar una fecha futura.
+            </p>
+            <input
+              id="reflection-date"
+              data-date
+              type="datetime-local"
+              required
+              aria-describedby="reflection-date-help"
+              class="mt-2 h-12 w-full rounded-xl border border-stone-300 bg-white px-4 text-base outline-none transition focus:border-amber-700 focus:ring-2 focus:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900"
+            />
+          </div>
+        </div>
+
+        <details data-advanced class="mt-5 rounded-xl border border-stone-200 dark:border-stone-800">
+          <summary
+            class="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 text-sm font-semibold marker:content-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+          >
+            Opciones avanzadas <span aria-hidden="true" class="text-stone-400">＋</span>
+          </summary>
+          <div class="border-t border-stone-200 p-4 dark:border-stone-800">
+            <label for="reflection-slug" class="text-sm font-semibold text-stone-900 dark:text-stone-100">
+              URL del artículo
+            </label>
+            <p id="reflection-slug-help" class="mt-1 text-sm leading-5 text-stone-500 dark:text-stone-400">
+              Se genera automáticamente a partir del título. Normalmente no necesitas modificarla.
+            </p>
+            <div
+              class="mt-2 flex min-h-12 items-center rounded-xl border border-stone-300 bg-stone-50 focus-within:border-amber-700 focus-within:ring-2 focus-within:ring-amber-700/15 dark:border-stone-700 dark:bg-stone-900"
+            >
+              <span class="pl-4 text-sm text-stone-400" aria-hidden="true">/reflexiones/</span>
+              <input
+                id="reflection-slug"
+                data-slug
+                required
+                aria-describedby="reflection-slug-help reflection-url-preview"
+                placeholder="url-del-articulo"
+                class="h-11 min-w-0 flex-1 bg-transparent pr-4 text-sm text-stone-950 outline-none dark:text-white"
+              />
+            </div>
+            <p id="reflection-url-preview" data-url-preview class="mt-2 break-all text-xs text-stone-500"></p>
+          </div>
+        </details>
+      </fieldset>
+
+      <div
+        class="rounded-2xl border border-stone-200 bg-white/95 p-3 shadow-[0_16px_50px_rgba(28,25,23,0.12)] backdrop-blur-xl dark:border-stone-800 dark:bg-stone-950/95 sm:sticky sm:bottom-3 sm:z-20"
+      >
+        <div class="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+          <button
+            data-save-draft
+            type="button"
+            class="min-h-11 rounded-full border border-stone-300 px-5 text-sm font-semibold text-stone-800 transition hover:border-stone-500 disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-stone-700 dark:text-stone-100"
+          >
+            Guardar borrador
+          </button>
+          <button
+            data-preview
+            type="button"
+            class="min-h-11 rounded-full px-5 text-sm font-semibold text-stone-700 transition hover:bg-stone-100 disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:text-stone-200 dark:hover:bg-stone-900"
+          >
+            Vista previa
+          </button>
+          <button
+            data-publish
+            type="submit"
+            class="min-h-11 rounded-full bg-stone-950 px-6 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:cursor-wait disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:bg-white dark:text-stone-950 dark:hover:bg-stone-200"
+          >
+            Publicar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <dialog
+    data-preview-dialog
+    aria-labelledby="admin-preview-title"
+    class="m-auto max-h-[94dvh] w-[min(72rem,calc(100%-1.5rem))] overflow-hidden rounded-3xl border border-stone-200 bg-stone-950 p-0 text-white shadow-2xl backdrop:bg-stone-950/80 dark:border-stone-800"
+  >
+    <div class="flex max-h-[94dvh] flex-col">
+      <header class="flex min-h-16 items-center justify-between border-b border-white/10 px-5 sm:px-7">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-400">Vista previa editorial</p>
+          <h2 id="admin-preview-title" class="sr-only">Vista previa de la reflexión</h2>
+        </div>
+        <button
+          data-close-preview
+          type="button"
+          class="min-h-11 rounded-full border border-white/15 px-4 text-sm font-semibold transition hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        >
+          Cerrar
+        </button>
+      </header>
+      <div class="overflow-y-auto p-4 sm:p-7 lg:p-10">
+        <article class="mx-auto max-w-5xl">
+          <div
+            data-preview-hero
+            class="relative aspect-[16/10] overflow-hidden rounded-2xl bg-stone-900 sm:aspect-video"
+          >
+            <img data-preview-image src="" alt="" class="hidden h-full w-full object-cover" />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/15 to-transparent"
+              aria-hidden="true"
+            >
+            </div>
+            <div class="absolute inset-x-0 bottom-0 p-5 sm:p-9">
+              <blockquote
+                data-preview-quote
+                class="max-w-3xl text-balance text-2xl font-semibold leading-tight sm:text-4xl"
+              >
+              </blockquote>
+              <p data-preview-author class="mt-3 text-sm text-white/75"></p>
+            </div>
+          </div>
+          <div class="mx-auto max-w-[42rem] py-8 sm:py-12">
+            <p class="text-sm text-stone-400">
+              <time data-preview-date></time><span aria-hidden="true"> · </span><span data-preview-time></span>
+            </p>
+            <h1
+              data-preview-title
+              class="mt-4 text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-5xl"
+            >
+            </h1>
+            <div data-preview-body class="mt-8 space-y-5 text-lg leading-8 text-stone-300"></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<style>
+  [data-preview-dialog]::backdrop {
+    backdrop-filter: blur(4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-preview-dialog]::backdrop {
+      backdrop-filter: none;
+    }
+  }
+</style>

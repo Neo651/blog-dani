@@ -1,0 +1,77 @@
+---
+/*
+====================================================
+AnalyticsClient
+
+Responsabilidad
+Inicializar el proveedor configurado y traducir navegación y CTA públicos a la API interna de Analytics.
+
+Datos que recibe
+Measurement ID público validado por el componente servidor Analytics.
+
+Dependencias
+Cliente central de Product Analytics y eventos de navegación de Astro.
+
+Qué no debe hacer
+No se renderiza sin configuración, no conoce Supabase y no captura texto, identidad ni campos de formularios.
+
+Autor: Daniel Montesinos
+====================================================
+*/
+
+export interface Props {
+  measurementId: string;
+}
+
+const { measurementId } = Astro.props;
+---
+
+<script is:inline id="analytics-bootstrap" data-measurement-id={measurementId}>
+  (() => {
+    const measurementId = document.getElementById('analytics-bootstrap')?.dataset.measurementId;
+    if (!measurementId) return;
+    window.dataLayer = window.dataLayer || [];
+    window.gtag =
+      window.gtag ||
+      function (...parameters) {
+        window.dataLayer.push(parameters);
+      };
+    window.gtag('js', new Date());
+    window.gtag('config', measurementId, { send_page_view: false, transport_type: 'beacon' });
+  })();
+</script>
+<script>
+  import { rememberReflectionEntrySource, trackEvent, trackPageView } from '~/features/analytics/client';
+  import type { ReflectionEntrySource } from '~/features/analytics/client';
+
+  let lastTrackedLocation = '';
+  const trackCurrentPage = () => {
+    const currentLocation = `${window.location.pathname}${window.location.search}`;
+    if (currentLocation === lastTrackedLocation) return;
+    lastTrackedLocation = currentLocation;
+    trackPageView();
+  };
+
+  trackCurrentPage();
+  document.addEventListener('astro:page-load', trackCurrentPage);
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const reflectionLink = event.target.closest<HTMLElement>('[data-reflection-source]');
+    if (reflectionLink) {
+      const anchor = reflectionLink.closest('a');
+      const slug = anchor?.pathname.split('/').filter(Boolean).at(-1);
+      if (slug) rememberReflectionEntrySource(slug, reflectionLink.dataset.reflectionSource as ReflectionEntrySource);
+    }
+
+    const cta = event.target.closest<HTMLElement>('[data-analytics-cta]');
+    if (cta) {
+      const anchor = cta.closest('a');
+      trackEvent('cta_click', {
+        cta_name: cta.dataset.analyticsCta,
+        source_page: window.location.pathname,
+        destination: anchor?.getAttribute('href') || '',
+      });
+    }
+  });
+</script>

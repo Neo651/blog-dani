@@ -1,2 +1,17 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+
+/rss.xml
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/sitemap-reflections.xml
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/admin*
+  Cache-Control: no-store
+
+/auth/*
+  Cache-Control: no-store

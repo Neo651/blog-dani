@@ -55,7 +55,7 @@ const { reflections } = Astro.props;
         </h2>
         <div class="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {reflections.map((reflection) => (
-            <ReflectionCard reflection={reflection} />
+            <ReflectionCard reflection={reflection} entrySource="related" />
           ))}
         </div>
       </div>

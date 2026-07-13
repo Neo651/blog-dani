@@ -40,6 +40,11 @@ const shareContent: ReflectionShareContent = { title, quote, author, url };
 const destinations = buildSocialShareDestinations(shareContent);
 const popoverId = `share-popover-${String(shareKey).replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 const isReading = variant === 'reading';
+const analyticsLocation = String(shareKey).startsWith('reading-')
+  ? 'reading'
+  : String(shareKey).startsWith('featured-')
+    ? 'home_featured'
+    : 'reflection_card';
 ---
 
 <div
@@ -48,6 +53,7 @@ const isReading = variant === 'reading';
   data-share-quote={quote}
   data-share-author={author}
   data-share-url={url}
+  data-share-location={analyticsLocation}
   class:list={['relative', isReading ? 'w-full' : 'shrink-0']}
 >
   <button
@@ -101,6 +107,7 @@ const isReading = variant === 'reading';
             target="_blank"
             rel="noopener noreferrer"
             data-share-destination
+            data-share-channel={destination.label === 'X' ? 'x' : destination.label.toLowerCase()}
             class="flex min-h-11 items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition duration-150 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-stone-950 dark:hover:bg-white/[0.07] dark:focus-visible:outline-stone-50"
             aria-label={`Compartir en ${destination.label}; se abre en una pestaña nueva`}
           >
@@ -139,11 +146,13 @@ const isReading = variant === 'reading';
 
 <script>
   import {
+    canUseNativeShare,
     copyShareUrl,
     positionSharePopover,
     shareReflectionNatively,
     type ReflectionShareContent,
   } from '~/utils/share';
+  import { trackEvent } from '~/features/analytics/client';
 
   /**
    * Cada instancia conserva sus listeners y su foco. Esto permite tener varias tarjetas en Home sin un controlador
@@ -171,6 +180,8 @@ const isReading = variant === 'reading';
       author: root.dataset.shareAuthor || '',
       url: root.dataset.shareUrl || window.location.href,
     };
+    const reflectionSlug = new URL(content.url).pathname.split('/').filter(Boolean).at(-1) || '';
+    const location = root.dataset.shareLocation || 'unknown';
     let shouldRestoreFocus = false;
 
     const closePopover = () => {
@@ -180,6 +191,7 @@ const isReading = variant === 'reading';
     const closePopoverOnResize = () => closePopover();
 
     const openPopover = () => {
+      trackEvent('share_open', { reflection_slug: reflectionSlug, location, mechanism: 'popover' });
       shouldRestoreFocus = true;
       status.textContent = '';
       popover.showPopover();
@@ -191,8 +203,18 @@ const isReading = variant === 'reading';
 
     trigger.addEventListener('click', async () => {
       try {
+        if (canUseNativeShare()) {
+          trackEvent('share_open', { reflection_slug: reflectionSlug, location, mechanism: 'native' });
+        }
         const result = await shareReflectionNatively(content);
         if (result === 'unsupported') openPopover();
+        if (result === 'shared') {
+          trackEvent('share_click', { reflection_slug: reflectionSlug, channel: 'native', location });
+          trackEvent('share_success', { reflection_slug: reflectionSlug, channel: 'native', location });
+        }
+        if (result === 'cancelled') {
+          trackEvent('share_cancel', { reflection_slug: reflectionSlug, channel: 'native', location });
+        }
       } catch {
         // Un error real del diálogo nativo degrada al menú web; una cancelación ya fue absorbida por la utilidad.
         openPopover();
@@ -202,8 +224,10 @@ const isReading = variant === 'reading';
     copyButton.addEventListener('click', async () => {
       copyButton.disabled = true;
       try {
+        trackEvent('share_click', { reflection_slug: reflectionSlug, channel: 'copy_link', location });
         await copyShareUrl(content.url);
         status.textContent = 'Enlace copiado';
+        trackEvent('share_success', { reflection_slug: reflectionSlug, channel: 'copy_link', location });
       } catch {
         status.textContent = 'No se pudo copiar el enlace';
       } finally {
@@ -212,7 +236,16 @@ const isReading = variant === 'reading';
     });
 
     popover.querySelectorAll('[data-share-destination]').forEach((destination) => {
-      destination.addEventListener('click', closePopover);
+      destination.addEventListener('click', () => {
+        if (destination instanceof HTMLElement) {
+          trackEvent('share_click', {
+            reflection_slug: reflectionSlug,
+            channel: destination.dataset.shareChannel || 'unknown',
+            location,
+          });
+        }
+        closePopover();
+      });
     });
 
     popover.addEventListener('toggle', () => {

@@ -58,6 +58,7 @@ const titleLines = hero.title.split('\n');
     </p>
     <a
       href={hero.cta.href}
+      data-analytics-cta="comenzar_a_leer"
       class="landing-reveal landing-reveal-delay-3 mt-11 inline-flex min-h-12 items-center justify-center rounded-full bg-stone-950 px-7 py-3 text-base font-semibold text-white shadow-sm transition duration-300 hover:-translate-y-0.5 hover:scale-[1.015] hover:bg-stone-800 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white"
     >
       {hero.cta.label}<span aria-hidden="true" class="ml-2">↓</span>
@@ -65,6 +66,7 @@ const titleLines = hero.title.split('\n');
     <p class="landing-reveal landing-reveal-delay-4 mt-5">
       <a
         href={hero.aboutCta.href}
+        data-analytics-cta="conoceme"
         class="inline-flex rounded-sm px-2 py-1 text-sm font-semibold text-stone-500 transition duration-300 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 dark:text-stone-400 dark:hover:text-stone-50"
         >{hero.aboutCta.label}</a
       >

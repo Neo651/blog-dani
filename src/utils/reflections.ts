@@ -22,3 +22,12 @@ export const calculateReadingMinutes = (body: string) => {
   const wordCount = body.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.ceil(wordCount / 220));
 };
+
+const EDITORIAL_SECTION_LABELS = new Set(['pregunta', 'desarrollo', 'reflexión', 'cierre']);
+
+/**
+ * Reconoce únicamente una etiqueta editorial completa. No analiza frases ni intenta inferir intención: esta regla
+ * deliberadamente estricta permite jerarquizar los campos usados por el autor sin transformar prosa legítima.
+ */
+export const isEditorialSectionLabel = (value: string) =>
+  EDITORIAL_SECTION_LABELS.has(value.trim().replace(/:$/, '').toLocaleLowerCase('es'));

@@ -16,5 +16,10 @@ export const GET: APIRoute = async ({ site }) => {
       pubDate: new Date(reflection.published_at),
     })),
   });
-  return new Response(rss, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } });
+  return new Response(rss, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+    },
+  });
 };

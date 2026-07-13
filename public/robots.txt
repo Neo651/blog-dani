@@ -1,2 +1,7 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /auth/
+
+Sitemap: https://danielmontesinos.com/sitemap-index.xml
+Sitemap: https://danielmontesinos.com/sitemap-reflections.xml

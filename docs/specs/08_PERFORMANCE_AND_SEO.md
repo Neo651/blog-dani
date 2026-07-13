@@ -1,8 +1,10 @@
-# Performance & SEO Experience
+# Feature 08 — Performance, SEO & Product Analytics
 
-Versión: 1.0
+Versión: 2.0
 
-Estado: Pendiente
+Estado: 🟡 Implementada — pendiente activación GA4 y Lighthouse de campo
+
+Fecha de implementación: 13 de julio de 2026
 
 Prioridad: 🔴 Crítica
 
@@ -10,15 +12,15 @@ Prioridad: 🔴 Crítica
 
 # Objetivo
 
-Construir un sitio extremadamente rápido, accesible y optimizado para buscadores.
+Construir un sitio extremadamente rápido, accesible, medible y optimizado para buscadores, redes sociales y motores de IA.
 
-El rendimiento forma parte de la experiencia del usuario.
+La velocidad forma parte de la experiencia.
 
-Un sitio lento nunca ofrecerá una experiencia premium.
+El SEO forma parte de la distribución.
 
-El SEO no existe únicamente para conseguir visitas.
+La analítica forma parte de la toma de decisiones.
 
-Existe para ayudar a que más personas encuentren contenido que realmente pueda aportarles valor.
+Cada una debe ayudar a que más personas encuentren, lean, compartan y regresen al contenido.
 
 ---
 
@@ -26,51 +28,84 @@ Existe para ayudar a que más personas encuentren contenido que realmente pueda 
 
 Cada milisegundo importa.
 
-Cada kilobyte innecesario debe cuestionarse.
+Cada consulta debe justificarse.
 
-Cada dependencia debe justificarse.
+Cada dependencia debe aportar valor.
 
-Cada consulta debe aportar valor.
+Cada byte innecesario debe cuestionarse.
 
-La velocidad forma parte del diseño.
+Cada decisión debe medirse.
+
+No optimizar por intuición.
+
+Optimizar con evidencia.
+
+---
+
+# Principios
+
+El lector siempre está primero.
+
+La simplicidad es una característica.
+
+No perseguimos puntuaciones.
+
+Perseguimos una experiencia excelente.
+
+No optimizar prematuramente.
+
+Primero medir.
+
+Luego entender.
+
+Finalmente optimizar.
 
 ---
 
 # Objetivos
 
-Lograr una experiencia excelente en:
+Lograr excelencia en:
 
-Velocidad
-
-Accesibilidad
-
-SEO
-
-Core Web Vitals
-
-Mantenibilidad
-
-Escalabilidad
+- Performance
+- SEO
+- Accesibilidad
+- Core Web Vitals
+- Analytics
+- Compartidos
+- Mantenibilidad
+- Escalabilidad
 
 ---
 
-# Objetivos de rendimiento
+# Performance Budget
 
-Tiempo de carga inicial muy bajo.
+Antes de agregar nuevas dependencias evaluar su impacto.
 
-Interacciones fluidas.
+Objetivos aproximados:
 
-Transiciones rápidas.
+JavaScript inicial
 
-Excelente experiencia incluso en conexiones lentas.
+< 120 KB comprimido
 
-Optimización progresiva.
+CSS inicial
+
+< 40 KB
+
+Hero principal
+
+< 350 KB
+
+Fuentes
+
+Máximo dos familias.
+
+Evitar dependencias pesadas si existe una solución nativa.
 
 ---
 
 # Lighthouse
 
-Objetivo mínimo
+Objetivos mínimos
 
 Performance
 
@@ -92,8 +127,6 @@ SEO
 
 # Core Web Vitals
 
-Objetivos
-
 Largest Contentful Paint (LCP)
 
 < 2.5 s
@@ -106,21 +139,37 @@ Cumulative Layout Shift (CLS)
 
 < 0.1
 
+Mantener estos valores también en dispositivos móviles.
+
 ---
 
 # Optimización de imágenes
 
 Todas las imágenes deben:
 
-Estar comprimidas.
+- utilizar Astro Image
+- estar optimizadas automáticamente
+- servir WebP
+- preparar AVIF cuando sea estable
+- mantener excelente calidad
+- respetar dimensiones reales
+- usar lazy loading cuando corresponda
+- evitar layout shift
+- mostrar placeholder elegante
 
-Tener dimensiones adecuadas.
+Las Hero Images:
 
-Mantener buena calidad.
+16:9
 
-Usar lazy loading cuando corresponda.
+1920x1080 mínimo
 
-Mostrar placeholder elegante.
+Sin texto incrustado
+
+Sin logotipos
+
+Sin firmas
+
+Toda la información editorial debe renderizarse mediante HTML.
 
 ---
 
@@ -128,21 +177,27 @@ Mostrar placeholder elegante.
 
 Enviar únicamente el JavaScript necesario.
 
-Evitar hidratar componentes que pueden renderizarse en servidor.
+Priorizar SSR.
 
-Preferir SSR cuando sea posible.
+Evitar hidratar componentes innecesarios.
 
-Evitar librerías pesadas.
+Usar islands solamente cuando realmente aporten valor.
+
+Eliminar código muerto.
+
+Evitar librerías grandes.
 
 ---
 
 # CSS
 
-Eliminar CSS no utilizado.
+Eliminar estilos no utilizados.
 
-Mantener estilos organizados.
+Mantener consistencia.
 
-Evitar reglas duplicadas.
+Reducir duplicación.
+
+No introducir frameworks adicionales salvo necesidad justificada.
 
 ---
 
@@ -154,9 +209,11 @@ Optimizar carga.
 
 Evitar bloqueos del render.
 
+Mantener excelente legibilidad.
+
 ---
 
-# SEO
+# SEO Técnico
 
 Toda página debe incluir:
 
@@ -170,33 +227,107 @@ Open Graph
 
 Twitter Card
 
-Favicon
-
 Robots
 
 Sitemap
 
 RSS
 
+Favicon
+
+Metadata consistente.
+
+---
+
+# SEO Editorial
+
+Cada artículo debe responder una intención clara.
+
+Escribir primero para personas.
+
+No utilizar clickbait.
+
+Los títulos deben generar curiosidad sin engañar.
+
+Las meta descripciones deben invitar a leer.
+
+Cada reflexión debe tener personalidad propia.
+
 ---
 
 # Reflexiones
 
-Cada reflexión debe tener:
+Cada reflexión debe incluir:
 
-Slug amigable.
+Slug amigable
 
-Metadata única.
+Título único
 
-Descripción única.
+Descripción única
 
-Imagen Open Graph.
+Open Graph propio
 
-Tiempo de lectura.
+Tiempo de lectura
 
-Fecha.
+Fecha
 
-Autor.
+Autor
+
+Canonical
+
+Imagen social
+
+---
+
+# Redes Sociales
+
+Cada reflexión debe verse correctamente al compartirse en:
+
+WhatsApp
+
+LinkedIn
+
+Facebook
+
+X
+
+Telegram
+
+Discord
+
+La metadata social debe incluir:
+
+imagen
+
+título
+
+descripción
+
+URL
+
+autor
+
+Nunca depender de JavaScript para generar metadata.
+
+---
+
+# AI Search Optimization
+
+Preparar el contenido para buscadores basados en IA.
+
+Mantener:
+
+HTML semántico
+
+Jerarquía H1-H2-H3
+
+JSON-LD
+
+Canonical
+
+Metadata consistente
+
+Contenido fácilmente interpretable por modelos de lenguaje.
 
 ---
 
@@ -224,11 +355,13 @@ Siempre:
 
 claras
 
-cortas
-
 legibles
 
+cortas
+
 estables
+
+No cambiar URLs publicadas.
 
 Evitar parámetros innecesarios.
 
@@ -238,35 +371,61 @@ Evitar parámetros innecesarios.
 
 Indexar:
 
-Home
+/
 
-/reflexiones
+reflexiones
 
-/reflexiones/[slug]
+reflexiones/[slug]
+
+sobre-mi
 
 Excluir:
 
-Admin
+admin
 
-Auth
+auth
 
-Páginas internas.
+páginas privadas
+
+rutas internas
+
+---
+
+# Crawlabilidad
+
+Ninguna reflexión debe quedar huérfana.
+
+Toda reflexión debe poder encontrarse desde:
+
+Home
+
+Discover
+
+Sitemap
+
+RSS
+
+Enlaces relacionados
 
 ---
 
 # Accesibilidad
 
-Contraste AA.
+Cumplir WCAG AA.
+
+Contraste correcto.
 
 Texto alternativo.
 
 Roles ARIA.
 
-Navegación por teclado.
-
 Focus visible.
 
-Labels correctos.
+Navegación por teclado.
+
+Targets táctiles ≥44 px.
+
+Mensajes accesibles.
 
 ---
 
@@ -280,13 +439,13 @@ Tablet
 
 Mobile
 
-No esconder funcionalidad importante.
+320 px
+
+Nunca esconder funcionalidades importantes.
 
 ---
 
 # Seguridad
-
-Cabeceras de seguridad.
 
 HTTPS obligatorio.
 
@@ -294,45 +453,149 @@ OAuth seguro.
 
 RLS.
 
-No exponer claves privadas.
+No exponer claves.
+
+Cabeceras de seguridad.
+
+Sanitización de entradas.
 
 ---
 
-# Analytics
+# Product Analytics
 
-Implementar:
+La analítica debe servir para tomar decisiones.
 
-Google Analytics.
+Nunca recopilar información sensible.
 
-Cloudflare Analytics (cuando aporte valor).
+Registrar únicamente información útil.
 
-No rastrear información sensible.
+---
 
-Medir únicamente datos útiles para mejorar el producto.
+# Eventos mínimos
+
+Reflection Open
+
+Reflection Finish
+
+Reflection Scroll 25%
+
+Reflection Scroll 50%
+
+Reflection Scroll 75%
+
+Reflection Scroll 100%
+
+Reading Time
+
+Like
+
+Comment
+
+Share Click
+
+Share Success
+
+CTA Leer
+
+CTA Conóceme
+
+CTA Sobre mí
+
+Newsletter (futuro)
+
+Podcast (futuro)
+
+Búsqueda (futuro)
 
 ---
 
 # Métricas de producto
 
-Priorizar:
+Medir:
 
-Tiempo de lectura.
+Usuarios únicos
 
-Usuarios recurrentes.
+Usuarios recurrentes
 
-Reflexiones terminadas.
+Tiempo promedio de lectura
 
-Compartidos.
+Tiempo real de permanencia
 
-Comentarios de calidad.
+Artículos terminados
 
-No obsesionarse con:
+Artículos abandonados
 
-Page Views.
+Artículos más compartidos
 
-Clicks.
+Artículos con mayor engagement
 
-Bounce Rate aislado.
+Comentarios por artículo
+
+Likes por artículo
+
+Origen del tráfico
+
+Dispositivo
+
+Navegador
+
+País
+
+Ciudad (si Analytics lo permite)
+
+Conversión:
+
+Home → Reflexión
+
+Reflexión → Sobre mí
+
+Sobre mí → Redes
+
+---
+
+# Dashboard futuro
+
+Preparar arquitectura para mostrar posteriormente:
+
+Visitantes totales
+
+Visitantes del día
+
+Visitantes del mes
+
+Lectores activos
+
+Artículos publicados
+
+Total de lecturas
+
+Total de compartidos
+
+Tiempo promedio de lectura
+
+Top artículos
+
+Top fuentes de tráfico
+
+Top países
+
+Top dispositivos
+
+Estos indicadores podrán mostrarse tanto en el panel administrativo como, si se desea, algunos de forma pública (por ejemplo, contador de lectores o visitas).
+
+---
+
+# Analytics
+
+Preparar integración con:
+
+Google Analytics 4
+
+Cloudflare Analytics
+
+Cloudflare Web Analytics
+
+Mantener desacoplada la implementación para poder cambiar de proveedor.
 
 ---
 
@@ -340,65 +603,127 @@ Bounce Rate aislado.
 
 Aprovechar:
 
-Cloudflare CDN.
+Cloudflare CDN
 
-Cache-Control.
+Cache-Control
 
-ETag cuando corresponda.
+ETag
 
-Preparar para futuras optimizaciones.
+Immutable assets
+
+Invalidación cuando corresponda.
 
 ---
 
 # Base de datos
 
+Seleccionar únicamente columnas necesarias.
+
 Evitar consultas repetidas.
 
-Seleccionar únicamente las columnas necesarias.
+Evitar N+1.
 
 Preparar índices cuando el crecimiento lo requiera.
 
----
-
-# Rendimiento del frontend
-
-Reducir re-renderizados.
-
-Lazy Loading cuando aporte valor.
-
-Code Splitting.
-
-Evitar dependencias innecesarias.
+Agrupar métricas cuando existan cientos de reflexiones.
 
 ---
 
-# Rendimiento del backend
+# Observabilidad
 
-Consultas optimizadas.
+Registrar:
 
-Storage eficiente.
+Errores
 
-No duplicar peticiones.
+Tiempo de respuesta
 
-Manejo adecuado de errores.
+Consultas lentas
+
+Fallos de Supabase
+
+Fallos de Storage
+
+Fallos de OAuth
+
+Fallos de Share
+
+Errores inesperados del Worker
+
+---
+
+# Calidad visual
+
+No sacrificar experiencia por mejorar métricas.
+
+Siempre priorizar:
+
+Legibilidad
+
+Jerarquía
+
+Espacio en blanco
+
+Consistencia
+
+Velocidad percibida
+
+---
+
+# Feature Budget
+
+Antes de implementar cualquier nueva funcionalidad responder:
+
+¿Hace el producto más útil?
+
+¿Hace el producto más simple?
+
+¿Hace el producto más rápido?
+
+Si la respuesta es no en las tres preguntas, reconsiderar su implementación.
+
+---
+
+# Error Budget
+
+Ante cualquier fallo:
+
+Mostrar contenido antes que errores.
+
+Una métrica puede fallar.
+
+Una imagen puede tardar.
+
+Un contador puede no cargar.
+
+Pero la reflexión debe seguir siendo legible.
+
+La lectura tiene prioridad.
 
 ---
 
 # Fuera de alcance
 
-No implementar:
+No implementar todavía:
 
 AMP
 
 Microfrontends
 
-CDN personalizados
-
 Optimización extrema prematura
 
 Compresión personalizada
 
-No optimizar antes de medir.
+CDN adicionales
+
+Renderizado complejo
+
+A/B Testing
+
+Heatmaps
+
+Session Recording
+
+No añadir complejidad antes de necesitarla.
 
 ---
 
@@ -406,7 +731,7 @@ No optimizar antes de medir.
 
 Toda la aplicación.
 
-Performance es una responsabilidad transversal.
+Performance, SEO y Analytics son responsabilidades transversales.
 
 ---
 
@@ -415,6 +740,8 @@ Performance es una responsabilidad transversal.
 astro.config.ts
 
 Cloudflare
+
+Workers
 
 Supabase
 
@@ -426,31 +753,43 @@ Components
 
 Assets
 
+Metadata
+
+Analytics
+
 ---
 
 # Checklist
 
-□ Lighthouse 95+
-
-□ SEO 100
+□ Lighthouse ≥95
 
 □ Accessibility 100
+
+□ SEO 100
 
 □ Best Practices 100
 
 □ Core Web Vitals correctos
 
-□ Sitemap
+☑ Sitemap
 
-□ RSS
+☑ Robots
 
-□ Robots
+☑ RSS
 
-□ Metadata
+☑ Metadata
 
-□ Open Graph
+☑ Open Graph
 
-□ Responsive
+☑ JSON-LD
+
+☑ Analytics funcionando con ID de prueba
+
+☑ Eventos instrumentados
+
+☑ Compartidos instrumentados sin falsos éxitos
+
+☑ Responsive validado en superficies instrumentadas
 
 □ Excelente rendimiento
 
@@ -462,29 +801,15 @@ La Feature estará terminada cuando:
 
 El sitio cargue rápidamente.
 
-La experiencia sea fluida.
+Toda página sea indexable.
 
-Las páginas sean fácilmente indexables.
+Las reflexiones compartidas se visualicen correctamente.
 
-Las reflexiones compartidas se vean correctamente en redes sociales.
+Analytics permita tomar decisiones reales.
 
-La arquitectura permita seguir creciendo sin degradar el rendimiento.
+Existan métricas suficientes para comprender el comportamiento del lector.
 
----
-
-# Inspiración
-
-Google Web.dev
-
-Vercel
-
-Astro
-
-Cloudflare
-
-No perseguir puntuaciones únicamente.
-
-Perseguir una experiencia excelente.
+La arquitectura permita crecer durante años sin degradar la experiencia.
 
 ---
 
@@ -494,6 +819,38 @@ La velocidad no es una optimización.
 
 Es una característica del producto.
 
-Cada mejora de rendimiento es una mejora directa en la experiencia del lector.
+El SEO no es una técnica.
 
-La mejor tecnología es aquella que el usuario nunca nota.
+Es una forma de ayudar a que las personas adecuadas encuentren una buena reflexión.
+
+La analítica no sirve para presumir números.
+
+Sirve para comprender mejor a los lectores y construir un blog cada vez más útil para ellos.
+
+---
+
+# Estado de implementación
+
+Implementado:
+
+- capa central tipada de Product Analytics, desacoplada de GA4;
+- activación opcional con `PUBLIC_GA_MEASUREMENT_ID` y degradación total sin proveedor;
+- exclusión de Analytics y `noindex` en Admin/Auth;
+- apertura, scroll 25/50/75/100, finalización y tiempo comprometido de lectura;
+- eventos de likes, comentarios, compartir y CTA únicamente tras los resultados definidos;
+- taxonomía, privacidad, configuración, interpretación y línea base documentadas;
+- WebSite, Person y Article JSON-LD; author y fecha Open Graph de artículos;
+- canonical, robots, RSS, 404 noindex y sitemaps público/dinámico validados;
+- sitemaps sin Admin, Auth ni borradores;
+- dimensiones explícitas en imágenes editoriales y preconexión al origen de la imagen social/LCP;
+- caché inmutable para assets y no-store para Admin/Auth.
+
+Pendiente externo, sin bloquear la experiencia:
+
+- configurar un Measurement ID real y decidir consentimiento según jurisdicción/configuración final;
+- confirmar que Cloudflare Web Analytics está habilitado una sola vez desde el dashboard;
+- ejecutar Lighthouse y validar Core Web Vitals sobre el despliegue real;
+- obtener datos de campo antes de optimizar las imágenes históricas de Supabase.
+
+La Feature no se marca como completamente cerrada porque esas comprobaciones requieren credenciales y entorno de
+producción. No se implementaron contador público, dashboard, Data API, GraphQL Analytics, heatmaps ni grabación de sesión.

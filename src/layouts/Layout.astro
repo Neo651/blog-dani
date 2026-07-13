@@ -23,6 +23,16 @@ export interface Props {
 
 const { metadata = {} } = Astro.props;
 const { language, textDirection } = I18N;
+let socialImageOrigin = '';
+try {
+  const socialImageUrl = metadata.openGraph?.images?.[0]?.url;
+  if (socialImageUrl) {
+    const origin = new URL(socialImageUrl, Astro.url).origin;
+    if (origin !== Astro.url.origin) socialImageOrigin = origin;
+  }
+} catch {
+  // Una URL editorial inválida no debe impedir el render ni generar una conexión incorrecta.
+}
 ---
 
 <!doctype html>
@@ -36,7 +46,7 @@ const { language, textDirection } = I18N;
     <SiteVerification />
     <Analytics />
 
-    <link rel="preconnect" href="https://images.unsplash.com" />
+    {socialImageOrigin && <link rel="preconnect" href={socialImageOrigin} crossorigin="anonymous" />}
 
     <!-- Comment the line below to disable View Transitions -->
     <ClientRouter fallback="swap" />

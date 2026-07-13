@@ -29,14 +29,20 @@ Autor: Daniel Montesinos
 
 export interface Props {
   reflectionId: number;
+  reflectionSlug?: string;
   presentation?: 'compact' | 'editorial';
 }
 
-const { reflectionId, presentation = 'compact' } = Astro.props;
+const { reflectionId, reflectionSlug = '', presentation = 'compact' } = Astro.props;
 const isEditorial = presentation === 'editorial';
 ---
 
-<div data-like-root data-reflection-id={reflectionId} data-like-presentation={presentation}>
+<div
+  data-like-root
+  data-reflection-id={reflectionId}
+  data-reflection-slug={reflectionSlug}
+  data-like-presentation={presentation}
+>
   {
     isEditorial ? (
       <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -80,6 +86,7 @@ const isEditorial = presentation === 'editorial';
 
 <script>
   import { ensureLikeUser, getLikeState, setLiked } from '~/features/likes/service';
+  import { trackEvent } from '~/features/analytics/client';
 
   const initialize = async (root: Element) => {
     if (!(root instanceof HTMLElement) || root.dataset.initialized === 'true') return;
@@ -135,8 +142,13 @@ const isEditorial = presentation === 'editorial';
       button.disabled = true;
       showError('');
       try {
-        await setLiked(reflectionId, userId, !liked);
+        const nextLikedState = !liked;
+        await setLiked(reflectionId, userId, nextLikedState);
         render(await getLikeState(reflectionId, userId));
+        trackEvent(nextLikedState ? 'like_add' : 'like_remove', {
+          reflection_slug: root.dataset.reflectionSlug || '',
+          location: root.dataset.likePresentation === 'editorial' ? 'reading' : 'featured',
+        });
       } catch (error) {
         showError(error instanceof Error ? error.message : 'No se pudo guardar el corazón.');
       } finally {
