@@ -206,6 +206,20 @@ X
 
 Copiar enlace
 
+Implementación cerrada:
+
+• La acción permanece inmediatamente después del like y antes de la conversación.
+
+• En dispositivos táctiles compatibles se utiliza Web Share API con título, frase, autor y URL canónica separados.
+
+• En escritorio y navegadores sin Web Share se ofrece un popover con todos los destinos previstos.
+
+• Copiar enlace comunica éxito o error mediante una región `aria-live`.
+
+• Escape, clic exterior, retorno de foco, navegación por teclado y posicionamiento dentro del viewport están validados.
+
+• El patrón reutiliza el mismo componente y utilidad de la Home; la experiencia de lectura no duplica lógica social.
+
 ---
 
 # Comentarios

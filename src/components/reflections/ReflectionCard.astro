@@ -7,20 +7,27 @@ Responsabilidad
 Presentar una reflexión reciente como preview editorial.
 
 Qué hace
-Muestra imagen, fecha, lectura, título, frase, métricas opcionales y acceso al contenido.
+Muestra imagen, fecha, lectura, título, frase, métricas opcionales, acceso al contenido y compartir siempre visible.
 
 Qué no hace
 No consulta Supabase ni administra likes o comentarios.
 
 Dependencias
-Tipo Reflection y utilidades de presentación.
+ShareActions, configuración pública, tipo Reflection y utilidades de presentación.
+
+Decisión de interacción
+Compartir vive junto a “Leer reflexión” y nunca depende del hover. El popover se eleva fuera de la tarjeta para que
+el recorte visual de la imagen no limite la navegación con ratón, teclado o dispositivo táctil.
 
 Autor: Daniel Montesinos
 ====================================================
 */
 
+import ShareActions from '~/components/social/ShareActions.astro';
+import { siteConfig } from '~/config/site';
 import type { Reflection } from '~/features/reflections/types';
 import { formatReflectionDate } from '~/utils/reflections';
+import { createReflectionShareUrl } from '~/utils/share';
 
 export interface Props {
   reflection: Reflection;
@@ -30,6 +37,12 @@ export interface Props {
 
 const { reflection, likeCount, commentCount } = Astro.props;
 const href = `/reflexiones/${reflection.slug}`;
+const shareUrl = createReflectionShareUrl({
+  slug: reflection.slug,
+  requestOrigin: Astro.url.origin,
+  productionOrigin: siteConfig.brand.siteUrl,
+  isProduction: import.meta.env.PROD,
+});
 ---
 
 <article
@@ -64,19 +77,30 @@ const href = `/reflexiones/${reflection.slug}`;
     >
       “{reflection.quote}”
     </blockquote>
-    {
-      (likeCount !== undefined || commentCount !== undefined) && (
-        <p class="mt-5 flex flex-wrap gap-4 text-xs text-stone-500 dark:text-stone-400">
-          {likeCount !== undefined && <span>♥ {likeCount} conexiones</span>}
-          {commentCount !== undefined && <span>◌ {commentCount} comentarios</span>}
-        </p>
-      )
-    }
-    <a
-      href={href}
-      class="mt-6 inline-flex min-h-11 w-fit items-center border-b border-stone-300 py-2 text-sm font-semibold text-stone-900 transition duration-300 hover:border-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-100"
-    >
-      Leer reflexión<span aria-hidden="true" class="ml-2 transition duration-300 group-hover:translate-x-1">→</span>
-    </a>
+    <div class="mt-auto flex flex-wrap items-end gap-x-4 gap-y-3 pt-6">
+      {
+        (likeCount !== undefined || commentCount !== undefined) && (
+          <p class="flex flex-1 flex-wrap gap-x-4 gap-y-1 pb-2 text-xs text-stone-500 dark:text-stone-400">
+            {likeCount !== undefined && <span>♥ {likeCount} conexiones</span>}
+            {commentCount !== undefined && <span>◌ {commentCount} comentarios</span>}
+          </p>
+        )
+      }
+      <div class="ml-auto flex items-center gap-2">
+        <a
+          href={href}
+          class="inline-flex min-h-11 w-fit items-center border-b border-stone-300 py-2 text-sm font-semibold text-stone-900 transition duration-300 hover:border-stone-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900 dark:border-stone-700 dark:text-stone-100 dark:hover:border-stone-100"
+        >
+          Leer reflexión<span aria-hidden="true" class="ml-2 transition duration-300 group-hover:translate-x-1">→</span>
+        </a>
+        <ShareActions
+          shareKey={`card-${reflection.id}`}
+          title={reflection.title}
+          quote={reflection.quote}
+          author={siteConfig.brand.name}
+          url={shareUrl}
+        />
+      </div>
+    </div>
   </div>
 </article>

@@ -4,101 +4,228 @@
 ShareActions
 
 Responsabilidad
-Permitir compartir una reflexión sin convertir las redes en protagonistas de la lectura.
+Ofrecer una única experiencia de compartir para la reflexión destacada, las tarjetas y la página individual.
 
 Qué renderiza
-Enlaces accesibles para WhatsApp, LinkedIn, Facebook y X, además de una acción para copiar la URL canónica.
+Un botón siempre visible y un popover accesible con WhatsApp, LinkedIn, Facebook, X y copia de enlace. En pantallas
+táctiles intenta primero el menú nativo del sistema; en escritorio conserva el popover editorial.
 
 Datos que recibe
-URL canónica, título y descripción reales de la reflexión.
+Identificador estable, título, frase, autor, URL canónica y una variante visual según el contexto editorial.
 
 Dependencias
-APIs nativas del navegador. No instala SDK ni librerías sociales.
+Utilidades compartidas de `utils/share` y APIs nativas Web Share, Clipboard y Popover.
 
 Qué no debe hacer
-No registra métricas, no consulta Supabase y no abre popups automáticos.
+No consulta Supabase, no modifica contenido, no registra likes y no decide dónde se ubica dentro de cada composición.
 
-Decisión de accesibilidad
-Cada destino es un enlace normal utilizable con teclado. La copia informa el resultado mediante una región aria-live;
-si Clipboard API no está disponible, se ofrece una instrucción clara sin recurrir a APIs obsoletas o diálogos invasivos.
+Decisiones de diseño y extensión
+El popover usa el top layer del navegador para no quedar recortado por tarjetas con overflow. La variante `icon`
+protege la jerarquía de Home; `reading` hace explícita la acción al terminar un artículo. Nuevas superficies deben
+reutilizar una de estas variantes antes de crear otra presentación.
 
 Autor: Daniel Montesinos
 ====================================================
 */
 
-export interface Props {
-  canonicalUrl: string;
-  title: string;
-  description: string;
+import { buildSocialShareDestinations, type ReflectionShareContent } from '~/utils/share';
+
+export interface Props extends ReflectionShareContent {
+  shareKey: string | number;
+  variant?: 'icon' | 'reading';
 }
 
-const { canonicalUrl, title, description } = Astro.props;
-const encodedUrl = encodeURIComponent(canonicalUrl);
-const encodedTitle = encodeURIComponent(title);
-const encodedMessage = encodeURIComponent(`${title}\n\n${description}\n${canonicalUrl}`);
-const destinations = [
-  { label: 'WhatsApp', href: `https://wa.me/?text=${encodedMessage}` },
-  { label: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}` },
-  { label: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}` },
-  { label: 'X', href: `https://x.com/intent/post?url=${encodedUrl}&text=${encodedTitle}` },
-] as const;
+const { shareKey, title, quote, author, url, variant = 'icon' } = Astro.props;
+const shareContent: ReflectionShareContent = { title, quote, author, url };
+const destinations = buildSocialShareDestinations(shareContent);
+const popoverId = `share-popover-${String(shareKey).replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+const isReading = variant === 'reading';
 ---
 
-<div data-share-root data-share-url={canonicalUrl} class="w-full">
-  <p class="text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 dark:text-stone-400">
-    Compartir esta reflexión
-  </p>
-  <div class="mt-3 flex flex-wrap gap-2">
-    {
-      destinations.map((destination) => (
-        <a
-          href={destination.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex min-h-11 items-center rounded-full border border-stone-300/80 bg-white/35 px-4 py-2 text-sm font-medium text-stone-600 transition duration-200 hover:border-stone-500 hover:bg-white/70 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-white/12 dark:bg-white/[0.025] dark:text-stone-300 dark:hover:border-white/25 dark:hover:bg-white/[0.055] dark:hover:text-stone-50"
-          aria-label={`Compartir en ${destination.label}; se abre en una pestaña nueva`}
-        >
-          {destination.label}
-        </a>
-      ))
-    }
-    <button
-      type="button"
-      data-copy-link
-      class="inline-flex min-h-11 items-center rounded-full border border-stone-300/80 bg-white/35 px-4 py-2 text-sm font-medium text-stone-600 transition duration-200 hover:border-stone-500 hover:bg-white/70 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-stone-950 dark:border-white/12 dark:bg-white/[0.025] dark:text-stone-300 dark:hover:border-white/25 dark:hover:bg-white/[0.055] dark:hover:text-stone-50"
+<div
+  data-share-root
+  data-share-title={title}
+  data-share-quote={quote}
+  data-share-author={author}
+  data-share-url={url}
+  class:list={['relative', isReading ? 'w-full' : 'shrink-0']}
+>
+  <button
+    type="button"
+    data-share-trigger
+    aria-label="Compartir reflexión"
+    title="Compartir reflexión"
+    aria-expanded="false"
+    aria-controls={popoverId}
+    class:list={[
+      'inline-flex min-h-11 items-center justify-center rounded-full border transition duration-200 focus-visible:outline-2 focus-visible:outline-offset-3',
+      isReading
+        ? 'gap-2 border-stone-300/90 bg-white/60 px-5 py-2.5 text-sm font-semibold text-stone-700 hover:border-stone-500 hover:bg-white hover:text-stone-950 focus-visible:outline-stone-950 dark:border-white/14 dark:bg-white/[0.035] dark:text-stone-200 dark:hover:border-white/25 dark:hover:bg-white/[0.07] dark:hover:text-white'
+        : 'h-11 w-11 border-stone-300/80 bg-white/85 text-stone-600 shadow-sm backdrop-blur-sm hover:border-stone-500 hover:bg-white hover:text-stone-950 focus-visible:outline-stone-950 dark:border-white/18 dark:bg-stone-950/72 dark:text-stone-200 dark:hover:border-white/30 dark:hover:bg-stone-900 dark:hover:text-white',
+    ]}
+  >
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      class="h-[1.1rem] w-[1.1rem]"
+      stroke="currentColor"
+      stroke-width="1.8"
     >
-      Copiar enlace
-    </button>
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M8.75 12.75 15.5 9m-6.75 2.25 6.75 3.75M18.25 8.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5ZM6.5 14.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Zm11.75 6a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z"
+      ></path>
+    </svg>
+    {isReading && <span>Compartir reflexión</span>}
+  </button>
+
+  <div
+    id={popoverId}
+    popover="auto"
+    data-share-popover
+    aria-label="Opciones para compartir"
+    class="fixed m-0 w-[min(17rem,calc(100vw-1.5rem))] rounded-2xl border border-stone-200 bg-white/98 p-2.5 text-stone-800 shadow-[0_22px_60px_-20px_rgba(28,25,23,0.45)] backdrop-blur-xl dark:border-white/12 dark:bg-stone-900/98 dark:text-stone-100"
+  >
+    <p
+      class="px-3 pb-2 pt-1 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-stone-500 dark:text-stone-400"
+    >
+      Compartir en
+    </p>
+    <div class="grid gap-1">
+      {
+        destinations.map((destination) => (
+          <a
+            href={destination.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-share-destination
+            class="flex min-h-11 items-center justify-between rounded-xl px-3 py-2 text-sm font-medium transition duration-150 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-stone-950 dark:hover:bg-white/[0.07] dark:focus-visible:outline-stone-50"
+            aria-label={`Compartir en ${destination.label}; se abre en una pestaña nueva`}
+          >
+            <span>{destination.label}</span>
+            <span aria-hidden="true" class="text-stone-400">
+              ↗
+            </span>
+          </a>
+        ))
+      }
+      <button
+        type="button"
+        data-copy-link
+        class="flex min-h-11 items-center justify-between rounded-xl px-3 py-2 text-left text-sm font-medium transition duration-150 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-stone-950 dark:hover:bg-white/[0.07] dark:focus-visible:outline-stone-50"
+      >
+        <span>Copiar enlace</span>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          fill="none"
+          class="h-4 w-4 text-stone-400"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8.25 8.25V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 20.25 6v7.5A2.25 2.25 0 0 1 18 15.75h-2.25m-9.75-7.5h7.5A2.25 2.25 0 0 1 15.75 10.5V18A2.25 2.25 0 0 1 13.5 20.25H6A2.25 2.25 0 0 1 3.75 18v-7.5A2.25 2.25 0 0 1 6 8.25Z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+    <p data-share-status class="min-h-5 px-3 pt-2 text-xs text-stone-500 dark:text-stone-400" aria-live="polite"></p>
   </div>
-  <p data-copy-status class="mt-2 min-h-5 text-sm text-stone-500 dark:text-stone-400" aria-live="polite"></p>
 </div>
 
 <script>
-  /**
-   * Clipboard API funciona en el contexto HTTPS de producción. Fallar de forma explícita en navegadores antiguos evita
-   * depender de execCommand —obsoleto— y permite que la región aria-live explique cómo copiar manualmente.
-   */
-  const copyText = async (text: string) => {
-    if (!navigator.clipboard?.writeText) throw new Error('Clipboard API no disponible.');
-    await navigator.clipboard.writeText(text);
-  };
+  import {
+    copyShareUrl,
+    positionSharePopover,
+    shareReflectionNatively,
+    type ReflectionShareContent,
+  } from '~/utils/share';
 
+  /**
+   * Cada instancia conserva sus listeners y su foco. Esto permite tener varias tarjetas en Home sin un controlador
+   * global que deba adivinar qué botón abrió el popover.
+   */
   const initializeShareActions = (root: Element) => {
     if (!(root instanceof HTMLElement) || root.dataset.initialized === 'true') return;
     root.dataset.initialized = 'true';
-    const button = root.querySelector('[data-copy-link]');
-    const status = root.querySelector('[data-copy-status]');
-    if (!(button instanceof HTMLButtonElement) || !(status instanceof HTMLElement)) return;
 
-    button.addEventListener('click', async () => {
-      button.disabled = true;
+    const trigger = root.querySelector('[data-share-trigger]');
+    const popover = root.querySelector('[data-share-popover]');
+    const copyButton = root.querySelector('[data-copy-link]');
+    const status = root.querySelector('[data-share-status]');
+    if (
+      !(trigger instanceof HTMLButtonElement) ||
+      !(popover instanceof HTMLElement) ||
+      !(copyButton instanceof HTMLButtonElement) ||
+      !(status instanceof HTMLElement)
+    )
+      return;
+
+    const content: ReflectionShareContent = {
+      title: root.dataset.shareTitle || '',
+      quote: root.dataset.shareQuote || '',
+      author: root.dataset.shareAuthor || '',
+      url: root.dataset.shareUrl || window.location.href,
+    };
+    let shouldRestoreFocus = false;
+
+    const closePopover = () => {
+      if (popover.matches(':popover-open')) popover.hidePopover();
+    };
+
+    const closePopoverOnResize = () => closePopover();
+
+    const openPopover = () => {
+      shouldRestoreFocus = true;
+      status.textContent = '';
+      popover.showPopover();
+      positionSharePopover(trigger, popover);
+      trigger.setAttribute('aria-expanded', 'true');
+      const firstDestination = popover.querySelector('[data-share-destination]');
+      if (firstDestination instanceof HTMLElement) firstDestination.focus();
+    };
+
+    trigger.addEventListener('click', async () => {
       try {
-        await copyText(root.dataset.shareUrl || window.location.href);
-        status.textContent = 'Enlace copiado.';
+        const result = await shareReflectionNatively(content);
+        if (result === 'unsupported') openPopover();
       } catch {
-        status.textContent = 'No pudimos copiarlo. Puedes copiar la dirección desde el navegador.';
+        // Un error real del diálogo nativo degrada al menú web; una cancelación ya fue absorbida por la utilidad.
+        openPopover();
+      }
+    });
+
+    copyButton.addEventListener('click', async () => {
+      copyButton.disabled = true;
+      try {
+        await copyShareUrl(content.url);
+        status.textContent = 'Enlace copiado';
+      } catch {
+        status.textContent = 'No se pudo copiar el enlace';
       } finally {
-        button.disabled = false;
+        copyButton.disabled = false;
+      }
+    });
+
+    popover.querySelectorAll('[data-share-destination]').forEach((destination) => {
+      destination.addEventListener('click', closePopover);
+    });
+
+    popover.addEventListener('toggle', () => {
+      const isOpen = popover.matches(':popover-open');
+      trigger.setAttribute('aria-expanded', String(isOpen));
+      if (isOpen) {
+        window.addEventListener('resize', closePopoverOnResize);
+      } else if (shouldRestoreFocus) {
+        window.removeEventListener('resize', closePopoverOnResize);
+        shouldRestoreFocus = false;
+        trigger.focus();
+      } else {
+        window.removeEventListener('resize', closePopoverOnResize);
       }
     });
   };
@@ -109,3 +236,33 @@ const destinations = [
   initializeAllShareActions();
   document.addEventListener('astro:page-load', initializeAllShareActions);
 </script>
+
+<style is:global>
+  [data-share-popover] {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.985);
+    transition:
+      opacity 150ms ease,
+      transform 150ms ease,
+      display 150ms allow-discrete,
+      overlay 150ms allow-discrete;
+  }
+
+  [data-share-popover]:popover-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  @starting-style {
+    [data-share-popover]:popover-open {
+      opacity: 0;
+      transform: translateY(-0.25rem) scale(0.985);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-share-popover] {
+      transition: none;
+    }
+  }
+</style>

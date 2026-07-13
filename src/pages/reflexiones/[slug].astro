@@ -126,7 +126,8 @@ const articleStructuredDataJson = JSON.stringify(articleStructuredData).replace(
             reflectionId={reflection.id}
             canonicalUrl={canonical}
             title={reflection.title}
-            description={description}
+            quote={reflection.quote}
+            author={siteConfig.brand.name}
           />
         </div>
       </article>

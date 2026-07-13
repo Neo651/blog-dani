@@ -2,7 +2,9 @@
 
 Versión: 1.0
 
-Estado: Pendiente de implementación
+Estado: Completada
+
+Fecha de cierre: 2026-07-13
 
 Prioridad: 🔴 Crítica
 
@@ -252,6 +254,28 @@ Leer reflexión
 
 ---
 
+# Compartir desde la Home
+
+La reflexión destacada y cada tarjeta de reflexiones anteriores permiten compartir su URL individual sin necesidad de
+abrir primero la página de lectura.
+
+Comportamiento acordado:
+
+• Acción siempre visible y táctil de al menos 44 × 44 px.
+
+• Web Share API en dispositivos táctiles compatibles.
+
+• Popover accesible en escritorio y como fallback, con WhatsApp, LinkedIn, Facebook, X y copia de enlace.
+
+• Título, frase, autor y URL real de cada reflexión; nunca se comparte la URL de la Home por error.
+
+• Cierre con Escape o clic exterior, devolución de foco y navegación completa mediante teclado.
+
+La lógica vive en un único componente y una única utilidad compartidos con Reading Experience. Home solo decide la
+ubicación editorial de la acción y no conoce detalles de redes, portapapeles o APIs del navegador.
+
+---
+
 # Biblioteca
 
 Debajo de las tarjetas mostrar:
@@ -485,6 +509,10 @@ src/layouts/
 □ SEO
 
 □ Rendimiento
+
+✅ Compartir reflexión destacada
+
+✅ Compartir tarjetas anteriores
 
 ---
 

@@ -33,10 +33,11 @@ export interface Props {
   reflectionId: number;
   canonicalUrl: string;
   title: string;
-  description: string;
+  quote: string;
+  author: string;
 }
 
-const { reflectionId, canonicalUrl, title, description } = Astro.props;
+const { reflectionId, canonicalUrl, title, quote, author } = Astro.props;
 ---
 
 <aside
@@ -45,6 +46,13 @@ const { reflectionId, canonicalUrl, title, description } = Astro.props;
 >
   <LikeButton reflectionId={reflectionId} presentation="editorial" />
   <div class="mt-5 border-t border-stone-200/70 pt-5 dark:border-white/[0.06]">
-    <ShareActions canonicalUrl={canonicalUrl} title={title} description={description} />
+    <ShareActions
+      shareKey={`reading-${reflectionId}`}
+      title={title}
+      quote={quote}
+      author={author}
+      url={canonicalUrl}
+      variant="reading"
+    />
   </div>
 </aside>

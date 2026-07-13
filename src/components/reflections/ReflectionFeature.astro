@@ -16,16 +16,22 @@ Qué no hace
 No consulta datos, no modifica el contenido editorial y no gestiona la conversación posterior.
 
 Dependencias
-LikeButton, tipo Reflection, configuración pública y utilidad de fecha.
+LikeButton, ShareActions, tipo Reflection, configuración pública y utilidades editoriales.
+
+Decisión de compartir
+La acción ocupa una esquina reservada de la cabecera visual, separada del texto editorial. Así puede descubrirse antes
+de abrir el artículo sin competir con el título ni alterar la continuidad entre contenido, reacción y comentarios.
 
 Autor: Daniel Montesinos
 ====================================================
 */
 
 import LikeButton from '~/components/social/LikeButton.astro';
+import ShareActions from '~/components/social/ShareActions.astro';
 import type { SiteConfig } from '~/config/site';
 import type { Reflection } from '~/features/reflections/types';
 import { formatReflectionDate } from '~/utils/reflections';
+import { createReflectionShareUrl } from '~/utils/share';
 
 export interface Props {
   reflection: Reflection;
@@ -35,6 +41,12 @@ export interface Props {
 
 const { reflection, brand, headingLevel = 'h1' } = Astro.props;
 const Heading = headingLevel;
+const shareUrl = createReflectionShareUrl({
+  slug: reflection.slug,
+  requestOrigin: Astro.url.origin,
+  productionOrigin: brand.siteUrl,
+  isProduction: import.meta.env.PROD,
+});
 const paragraphs = reflection.body
   .split(/\n\s*\n|\n/)
   .map((value) => value.trim())
@@ -54,7 +66,16 @@ const paragraphs = reflection.body
     />
     <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/45 to-stone-950/20"></div>
     <div class="relative flex min-h-[520px] flex-col justify-between p-7 text-white sm:min-h-[620px] sm:p-12 lg:p-16">
-      <p class="text-xs font-semibold uppercase tracking-[0.28em] text-white/75">{brand.name}</p>
+      <div class="flex items-start justify-between gap-6">
+        <p class="pt-3 text-xs font-semibold uppercase tracking-[0.28em] text-white/75">{brand.name}</p>
+        <ShareActions
+          shareKey={`featured-${reflection.id}`}
+          title={reflection.title}
+          quote={reflection.quote}
+          author={brand.name}
+          url={shareUrl}
+        />
+      </div>
       <div class="max-w-4xl">
         <p class="text-sm font-medium text-white/75">{formatReflectionDate(reflection.published_at)}</p>
         <blockquote
