@@ -21,6 +21,7 @@ import AnalyticsClient from '~/components/analytics/AnalyticsClient.astro';
 const isPrivateRoute =
   Astro.url.pathname === '/admin' ||
   Astro.url.pathname.startsWith('/admin/') ||
+  Astro.url.pathname === '/auth' ||
   Astro.url.pathname.startsWith('/auth/');
 const measurementId = isPrivateRoute ? '' : import.meta.env.PUBLIC_GA_MEASUREMENT_ID || '';
 ---
