@@ -56,14 +56,23 @@ try {
 
 const latest = reflections[0];
 const previous = reflections.slice(1, 4);
+const previousCount = previous.length;
+const previousSectionDescription =
+  previousCount === 1
+    ? 'Una idea reciente para volver a ella cuando necesites una perspectiva diferente.'
+    : previousCount === 2
+      ? 'Dos ideas recientes para volver a ellas cuando necesites una perspectiva diferente.'
+      : 'Tres ideas recientes para volver a ellas cuando necesites una perspectiva diferente.';
+const previousGridClass =
+  previousCount === 1 ? 'max-w-xl' : previousCount === 2 ? 'max-w-5xl md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3';
 ---
 
-<Layout metadata={metadata}>
+<Layout metadata={metadata} footerVariant="landing">
   <script type="application/ld+json" is:inline set:html={websiteStructuredDataJson} />
   <div class="landing-surface">
     <HeroSection hero={siteConfig.hero} />
 
-    <div class="px-5 sm:px-6">
+    <div class="landing-featured-transition px-5 sm:px-6">
       {
         loadError ? (
           <section class="mx-auto mb-24 max-w-3xl rounded-3xl border border-red-200 bg-red-50 p-8 text-center text-red-800 dark:border-red-950 dark:bg-red-950/20 dark:text-red-200">
@@ -71,8 +80,8 @@ const previous = reflections.slice(1, 4);
             <p class="mt-3">Inténtalo de nuevo en unos minutos. Este espacio seguirá aquí cuando regreses.</p>
           </section>
         ) : latest ? (
-          <section class="reading-conversation-flow mx-auto max-w-6xl pb-16 sm:pb-20 lg:pb-24">
-            <div id="reflexion-destacada" class="landing-anchor mb-8 max-w-2xl">
+          <section class="reading-conversation-flow mx-auto max-w-6xl pb-14 sm:pb-16 lg:pb-20">
+            <div id="reflexion-destacada" class="landing-anchor mb-7 max-w-2xl">
               <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
                 Reflexión más reciente
               </p>
@@ -94,62 +103,79 @@ const previous = reflections.slice(1, 4);
       }
     </div>
 
-    <section
-      class="border-y border-stone-200/80 bg-stone-50/60 px-5 py-18 dark:border-white/[0.07] dark:bg-white/[0.018] sm:px-6 sm:py-20 lg:py-24"
-    >
-      <div class="mx-auto max-w-7xl">
-        <div id="ultimas-reflexiones" class="landing-anchor landing-section-reveal max-w-2xl">
-          <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
-            Para seguir pensando
-          </p>
-          <h2
-            class="mt-4 text-balance text-4xl font-semibold tracking-[-0.035em] text-stone-950 dark:text-stone-50 sm:text-5xl"
-          >
-            Últimas reflexiones
-          </h2>
-          <p class="mt-5 text-lg leading-8 text-stone-600 dark:text-stone-300">
-            Tres ideas recientes para volver a ellas cuando necesites una perspectiva diferente.
-          </p>
-        </div>
-        {
-          previous.length > 0 ? (
-            <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {previous.map((reflection) => (
-                <div class="landing-section-reveal">
-                  <ReflectionCard
-                    reflection={reflection}
-                    entrySource="home_previous"
-                    likeCount={engagementAvailable ? (likeCounts.get(reflection.id) ?? 0) : undefined}
-                    commentCount={engagementAvailable ? (commentCounts.get(reflection.id) ?? 0) : undefined}
-                  />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-stone-200/80 bg-white/55 px-6 py-6 text-center dark:border-white/[0.07] dark:bg-white/[0.018] sm:flex-row sm:px-7 sm:text-left">
-              <div>
-                <p class="font-semibold text-stone-800 dark:text-stone-100">Nuevas reflexiones están en camino.</p>
-                <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
-                  Las mejores ideas merecen escribirse sin prisa.
+    {
+      !loadError && latest && (
+        <section
+          class:list={[
+            'border-y border-stone-200/80 bg-stone-50/60 px-5 dark:border-white/[0.07] dark:bg-white/[0.018] sm:px-6',
+            previousCount > 0 ? 'py-16 sm:py-18 lg:py-20' : 'py-11 sm:py-12',
+          ]}
+        >
+          <div class="mx-auto max-w-7xl">
+            <div
+              id="ultimas-reflexiones"
+              class="landing-anchor intersect-once intersect-quarter max-w-2xl motion-safe:opacity-0 motion-safe:intersect:animate-fade"
+            >
+              <p class="text-xs font-semibold uppercase tracking-[0.28em] text-stone-500 dark:text-stone-400 sm:text-sm">
+                Para seguir pensando
+              </p>
+              <h2 class="mt-4 text-balance text-3xl font-semibold tracking-[-0.035em] text-stone-950 dark:text-stone-50 sm:text-4xl">
+                Últimas reflexiones
+              </h2>
+              {previousCount > 0 && (
+                <p class="mt-4 text-base leading-7 text-stone-600 dark:text-stone-300 sm:text-lg sm:leading-8">
+                  {previousSectionDescription}
                 </p>
-              </div>
-              <span aria-hidden="true" class="text-xl text-amber-700/70 dark:text-amber-400/60">
-                ✦
-              </span>
+              )}
             </div>
-          )
-        }
-        <div class="mt-10 text-center">
-          <a
-            href="/reflexiones"
-            data-analytics-cta="ver_todas_reflexiones"
-            class="inline-flex min-h-12 items-center justify-center rounded-full border border-stone-300 bg-white px-7 py-3 font-semibold text-stone-900 transition duration-300 hover:-translate-y-0.5 hover:border-stone-500 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:border-stone-500"
-          >
-            Ver todas las reflexiones<span aria-hidden="true" class="ml-2">→</span>
-          </a>
-        </div>
-      </div>
-    </section>
+            {previousCount > 0 ? (
+              <div
+                class:list={[
+                  'intersect-once intersect-quarter mt-9 grid gap-6 motion-safe:opacity-0 motion-safe:intersect:animate-fade sm:mt-10',
+                  previousGridClass,
+                ]}
+              >
+                {previous.map((reflection) => (
+                  <div>
+                    <ReflectionCard
+                      reflection={reflection}
+                      entrySource="home_previous"
+                      visualVariant="landing"
+                      likeCount={engagementAvailable ? (likeCounts.get(reflection.id) ?? 0) : undefined}
+                      commentCount={engagementAvailable ? (commentCounts.get(reflection.id) ?? 0) : undefined}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="mt-7 flex flex-col items-center justify-between gap-3 rounded-2xl border border-stone-200/70 bg-white/45 px-5 py-5 text-center dark:border-white/[0.06] dark:bg-white/[0.015] sm:flex-row sm:px-6 sm:text-left">
+                <div>
+                  <p class="font-semibold text-stone-800 dark:text-stone-100">Nuevas reflexiones están en camino.</p>
+                  <p class="mt-1 text-sm text-stone-500 dark:text-stone-400">
+                    Las mejores ideas merecen escribirse sin prisa.
+                  </p>
+                </div>
+                <span aria-hidden="true" class="text-xl text-amber-700/70 dark:text-amber-400/60">
+                  ✦
+                </span>
+              </div>
+            )}
+            <div class:list={['text-center', previousCount > 0 ? 'mt-9' : 'mt-7']}>
+              <a
+                href="/reflexiones"
+                data-analytics-cta="ver_todas_reflexiones"
+                class="motion-reduce-landing-transform inline-flex min-h-12 items-center justify-center rounded-full border border-stone-300 bg-white px-7 py-3 font-semibold text-stone-900 transition duration-300 hover:-translate-y-0.5 hover:border-stone-500 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:border-stone-500"
+              >
+                Ver todas las reflexiones
+                <span aria-hidden="true" class="ml-2">
+                  →
+                </span>
+              </a>
+            </div>
+          </div>
+        </section>
+      )
+    }
 
     <AboutSection about={siteConfig.about} />
     <SocialSection social={siteConfig.social} />

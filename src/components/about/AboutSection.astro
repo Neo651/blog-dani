@@ -45,7 +45,7 @@ const isLanding = variant === 'landing';
 <section
   class:list={[
     'relative overflow-hidden border-y border-stone-200/80 bg-stone-50/70 px-6 dark:border-white/[0.07] dark:bg-white/[0.025]',
-    isLanding ? 'py-18 sm:py-20 lg:py-24' : 'py-14 sm:py-18 lg:py-20',
+    isLanding ? 'py-16 sm:py-18 lg:py-20' : 'py-14 sm:py-18 lg:py-20',
   ]}
 >
   <div
@@ -55,8 +55,10 @@ const isLanding = variant === 'landing';
   </div>
   <div
     class:list={[
-      'mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20',
-      isLanding && 'landing-section-reveal',
+      'mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]',
+      isLanding
+        ? 'intersect-once intersect-quarter lg:gap-16 motion-safe:opacity-0 motion-safe:intersect:animate-fade'
+        : 'lg:gap-20',
     ]}
   >
     <div
@@ -72,7 +74,12 @@ const isLanding = variant === 'landing';
         format="webp"
         loading={isLanding ? 'lazy' : 'eager'}
         fetchpriority={isLanding ? 'auto' : 'high'}
-        class="aspect-[4/5] h-full w-full object-cover object-top transition duration-700 hover:scale-[1.015]"
+        class:list={[
+          'aspect-[4/5] h-full w-full object-cover object-top transition',
+          isLanding
+            ? 'motion-reduce-landing-transform duration-400 hover:scale-[1.01]'
+            : 'duration-700 hover:scale-[1.015]',
+        ]}
       />
     </div>
     <!-- El leve desplazamiento óptico compensa el peso de la fotografía sin forzar una alineación matemática. -->

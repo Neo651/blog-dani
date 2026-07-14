@@ -51,6 +51,9 @@ const paragraphs = reflection.body
   .split(/\n\s*\n|\n/)
   .map((value) => value.trim())
   .filter(Boolean);
+// La portada ya identifica la autoría del sitio; repetir el mismo nombre debajo de la cita debilita la jerarquía.
+const showQuoteAttribution =
+  reflection.quote_author?.trim().toLocaleLowerCase() !== brand.name.trim().toLocaleLowerCase();
 ---
 
 <article
@@ -85,7 +88,11 @@ const paragraphs = reflection.body
         >
           “{reflection.quote}”
         </blockquote>
-        {reflection.quote_author && <p class="mt-6 text-lg text-white/85">— {reflection.quote_author}</p>}
+        {
+          reflection.quote_author && showQuoteAttribution && (
+            <p class="mt-6 text-lg text-white/85">— {reflection.quote_author}</p>
+          )
+        }
       </div>
       <p class="text-base font-medium text-white/85">{brand.tagline}</p>
     </div>

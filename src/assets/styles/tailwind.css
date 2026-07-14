@@ -69,11 +69,12 @@ html {
 /* Dos mapas pequeños de puntos simulan profundidad sin DOM repetido, canvas ni descarga de imágenes. */
 .hero-stars {
   background-repeat: repeat;
-  will-change: background-position, opacity;
+  inset: -2rem;
+  will-change: transform, opacity;
 }
 
 .hero-stars-distant {
-  opacity: 0.24;
+  opacity: 0.16;
   background-image:
     radial-gradient(circle, rgb(255 251 235 / 72%) 0 0.6px, transparent 0.8px),
     radial-gradient(circle, rgb(214 211 209 / 55%) 0 0.45px, transparent 0.7px);
@@ -83,11 +84,11 @@ html {
   background-size:
     137px 149px,
     193px 211px;
-  animation: hero-stars-drift 110s linear infinite;
+  animation: hero-stars-drift 140s linear infinite alternate;
 }
 
 .hero-stars-near {
-  opacity: 0.18;
+  opacity: 0.1;
   background-image:
     radial-gradient(circle, rgb(254 243 199 / 80%) 0 0.9px, transparent 1.15px),
     radial-gradient(circle, rgb(231 229 228 / 66%) 0 0.7px, transparent 1px);
@@ -97,7 +98,7 @@ html {
   background-size:
     263px 281px,
     337px 313px;
-  animation: hero-stars-breathe 18s ease-in-out infinite alternate;
+  animation: hero-stars-breathe 28s ease-in-out infinite alternate;
 }
 
 .hero-warm-horizon {
@@ -107,20 +108,23 @@ html {
     linear-gradient(180deg, transparent 56%, rgb(12 10 9 / 58%) 100%);
 }
 
+/* La primera reflexión recoge el halo inferior del Hero para que el cambio de ritmo no parezca un corte de página. */
+.dark .landing-featured-transition {
+  background: radial-gradient(ellipse at 50% 0%, rgb(120 53 15 / 4.5%), transparent 28rem);
+}
+
 @keyframes hero-stars-drift {
   to {
-    background-position:
-      18px 12px,
-      39px 86px;
+    transform: translate3d(0.75rem, 0.5rem, 0);
   }
 }
 
 @keyframes hero-stars-breathe {
   from {
-    opacity: 0.12;
+    opacity: 0.07;
   }
   to {
-    opacity: 0.22;
+    opacity: 0.12;
   }
 }
 
@@ -184,14 +188,6 @@ html {
   animation-delay: 320ms;
 }
 
-@supports (animation-timeline: view()) {
-  .landing-section-reveal {
-    animation: landing-reveal linear both;
-    animation-timeline: view();
-    animation-range: entry 5% cover 22%;
-  }
-}
-
 @keyframes landing-reveal {
   from {
     opacity: 0;
@@ -212,14 +208,15 @@ html {
     animation: none;
   }
 
-  .landing-section-reveal {
-    animation: none;
-  }
-
   /* El cielo conserva profundidad estática sin imponer movimiento a quien decidió reducirlo. */
   .hero-stars {
     animation: none;
     will-change: auto;
+  }
+
+  /* El sistema conserva estados visibles, pero elimina desplazamientos y escalas decorativas en la Landing. */
+  .landing-surface .motion-reduce-landing-transform {
+    transform: none !important;
   }
 }
 

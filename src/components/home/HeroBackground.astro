@@ -11,16 +11,16 @@ El futuro Fondo Vivo necesitará evolucionar de forma independiente al contenido
 Este componente evita que esa implementación obligue a refactorizar HeroSection o mezcle animación con contenido editorial.
 
 Qué resuelve ahora
-Construye un cielo nocturno editorial con profundidad, estrellas discretas y una respiración lumínica muy lenta.
-Todo se genera con CSS para evitar imágenes decorativas, JavaScript y trabajo continuo costoso.
+Construye un cielo nocturno editorial con profundidad y estrellas casi imperceptibles. Todo se genera con CSS para
+evitar imágenes decorativas, JavaScript y trabajo continuo costoso.
 
 Decisiones de diseño
-Las estrellas se dividen en dos planos con opacidades y velocidades distintas para sugerir distancia sin parecer un efecto tecnológico.
-El movimiento solo modifica fondos y opacidad, y desaparece por completo cuando el usuario prefiere movimiento reducido.
+Las estrellas se dividen en dos planos con opacidades y velocidades distintas para sugerir distancia sin parecer un
+efecto tecnológico. El movimiento queda limitado a transform y opacity, y desaparece cuando el usuario prefiere reducirlo.
 
-Qué no implementa todavía
-No incluye parallax, canvas, interacción con puntero ni estrellas fugaces. Una estrella episódica requiere validar frecuencia,
-visibilidad y distracción como una mejora independiente antes de incorporarla.
+Qué no implementa
+No incluye parallax, canvas, interacción con puntero ni cometas. Un destello episódico no justifica el coste continuo ni
+el riesgo de atravesar texto en esta composición; el fondo cumple su propósito sin convertir el movimiento en protagonista.
 
 Punto de extensión
 data-live-background-slot identifica el único contenedor donde se incorporará el futuro Feature de Fondo Vivo.

@@ -40,9 +40,18 @@ export interface Props {
   commentCount?: number;
   entireCardClickable?: boolean;
   entrySource?: 'home_previous' | 'discover' | 'related';
+  visualVariant?: 'default' | 'landing';
 }
 
-const { reflection, likeCount, commentCount, entireCardClickable = false, entrySource } = Astro.props;
+const {
+  reflection,
+  likeCount,
+  commentCount,
+  entireCardClickable = false,
+  entrySource,
+  visualVariant = 'default',
+} = Astro.props;
+const isLanding = visualVariant === 'landing';
 const href = `/reflexiones/${reflection.slug}`;
 const shareUrl = createReflectionShareUrl({
   slug: reflection.slug,
@@ -53,7 +62,12 @@ const shareUrl = createReflectionShareUrl({
 ---
 
 <article
-  class="group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white transition duration-500 hover:-translate-y-1.5 hover:border-stone-300 hover:shadow-[0_28px_70px_-40px_rgba(28,25,23,0.5)] dark:border-stone-800 dark:bg-stone-900 dark:hover:border-stone-700"
+  class:list={[
+    'group relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-stone-200 bg-white transition hover:border-stone-300 dark:border-stone-800 dark:bg-stone-900 dark:hover:border-stone-700',
+    isLanding
+      ? 'motion-reduce-landing-transform duration-300 hover:-translate-y-1 hover:shadow-[0_24px_60px_-42px_rgba(28,25,23,0.45)]'
+      : 'duration-500 hover:-translate-y-1.5 hover:shadow-[0_28px_70px_-40px_rgba(28,25,23,0.5)]',
+  ]}
 >
   {
     entireCardClickable ? (
@@ -65,7 +79,12 @@ const shareUrl = createReflectionShareUrl({
           height="500"
           loading="lazy"
           decoding="async"
-          class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+          class:list={[
+            'aspect-[16/10] h-full w-full object-cover transition ease-out',
+            isLanding
+              ? 'motion-reduce-landing-transform duration-400 group-hover:scale-[1.025]'
+              : 'duration-700 group-hover:scale-[1.035]',
+          ]}
         />
       </div>
     ) : (
@@ -83,7 +102,12 @@ const shareUrl = createReflectionShareUrl({
           height="500"
           loading="lazy"
           decoding="async"
-          class="aspect-[16/10] h-full w-full object-cover transition duration-700 ease-out group-hover:scale-[1.035]"
+          class:list={[
+            'aspect-[16/10] h-full w-full object-cover transition ease-out',
+            isLanding
+              ? 'motion-reduce-landing-transform duration-400 group-hover:scale-[1.025]'
+              : 'duration-700 group-hover:scale-[1.035]',
+          ]}
         />
       </a>
     )
