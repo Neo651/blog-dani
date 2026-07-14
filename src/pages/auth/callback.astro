@@ -1,7 +1,8 @@
 ---
 import Layout from '~/layouts/Layout.astro';
+import { getSafeAuthReturnTo } from '~/features/auth/returnTo';
 const returnTo = Astro.url.searchParams.get('returnTo');
-const safeReturnTo = returnTo?.startsWith('/') && !returnTo.startsWith('//') ? returnTo : '/';
+const safeReturnTo = getSafeAuthReturnTo(returnTo, Astro.url.origin);
 ---
 
 <Layout metadata={{ title: 'Completando inicio de sesión', robots: { index: false, follow: false } }}>
@@ -16,7 +17,7 @@ const safeReturnTo = returnTo?.startsWith('/') && !returnTo.startsWith('//') ? r
 <script>
   import { getSupabaseBrowserClient } from '~/lib/supabase/client';
   const root = document.querySelector('[data-auth-callback]');
-  const safeReturnTo = root instanceof HTMLElement ? root.dataset.returnTo || '/' : '/';
+  const safeReturnTo = root instanceof HTMLElement ? root.dataset.returnTo || '/reflexiones' : '/reflexiones';
   const client = getSupabaseBrowserClient();
   client.auth.getSession().finally(() => window.location.replace(safeReturnTo));
 </script>

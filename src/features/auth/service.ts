@@ -20,6 +20,7 @@ Autor: Daniel Montesinos
 */
 
 import { getSupabaseBrowserClient } from '~/lib/supabase/client';
+import { getSafeAuthReturnTo } from '~/features/auth/returnTo';
 
 export const getCurrentUser = async () => {
   const { data, error } = await getSupabaseBrowserClient().auth.getSession();
@@ -35,7 +36,7 @@ export const signInWithPassword = async (email: string, password: string) => {
 
 export const signInWithGoogle = async (returnTo: string) => {
   const callback = new URL('/auth/callback', window.location.origin);
-  callback.searchParams.set('returnTo', returnTo.startsWith('/') ? returnTo : '/');
+  callback.searchParams.set('returnTo', getSafeAuthReturnTo(returnTo, window.location.origin));
   const { error } = await getSupabaseBrowserClient().auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: callback.toString() },
