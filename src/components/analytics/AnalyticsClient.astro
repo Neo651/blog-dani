@@ -29,11 +29,7 @@ const { measurementId } = Astro.props;
 <script is:inline id="analytics-bootstrap" data-measurement-id={measurementId}>
   (() => {
     const measurementId = document.getElementById('analytics-bootstrap')?.dataset.measurementId;
-    console.log('measurementId', measurementId);
-    if (!measurementId) {
-      console.log('Analytics initialization skipped: empty measurementId');
-      return;
-    }
+    if (!measurementId) return;
     window.dataLayer = window.dataLayer || [];
     window.gtag =
       window.gtag ||
@@ -43,7 +39,6 @@ const { measurementId } = Astro.props;
       };
     window.gtag('js', new Date());
     window.gtag('config', measurementId, { send_page_view: false });
-    console.log('Analytics initialized');
   })();
 </script>
 <script>
@@ -53,12 +48,8 @@ const { measurementId } = Astro.props;
   let lastTrackedLocation = '';
   const trackCurrentPage = () => {
     const currentLocation = `${window.location.pathname}${window.location.search}`;
-    if (currentLocation === lastTrackedLocation) {
-      console.log('trackPageView skipped: location already tracked', currentLocation);
-      return;
-    }
+    if (currentLocation === lastTrackedLocation) return;
     lastTrackedLocation = currentLocation;
-    console.log('trackPageView', currentLocation);
     trackPageView();
   };
 
@@ -77,7 +68,6 @@ const { measurementId } = Astro.props;
     const cta = event.target.closest<HTMLElement>('[data-analytics-cta]');
     if (cta) {
       const anchor = cta.closest('a');
-      console.log('trackEvent', 'cta_click');
       trackEvent('cta_click', {
         cta_name: cta.dataset.analyticsCta,
         source_page: window.location.pathname,

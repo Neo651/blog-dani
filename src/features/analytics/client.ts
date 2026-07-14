@@ -54,7 +54,8 @@ export const trackEvent = (name: AnalyticsEventName, properties: AnalyticsProper
     return;
   try {
     window.gtag('event', name, properties);
-  } catch {
+  } catch (error) {
+    console.error('No se pudo enviar el evento de Analytics', { name, error });
     // Una métrica nunca debe interrumpir la navegación ni la lectura.
   }
 };
