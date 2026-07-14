@@ -48,7 +48,10 @@ Esperamos comentarios que:
 
 • discrepen con respeto
 
-No se aprobarán comentarios que:
+El MVP utiliza moderación reactiva: los comentarios de personas autenticadas aparecen inmediatamente. El administrador
+puede eliminarlos posteriormente cuando incumplan este código de la comunidad.
+
+Se eliminarán comentarios que:
 
 • insulten
 
@@ -60,4 +63,5 @@ No se aprobarán comentarios que:
 
 • busquen provocar conflictos
 
-La moderación protegerá siempre la calidad de la conversación antes que la cantidad de comentarios.
+La moderación protegerá siempre la calidad de la conversación antes que la cantidad de comentarios. La aprobación
+previa podrá reactivarse cuando exista mayor tráfico o abuso.

@@ -7,7 +7,7 @@ Responsabilidad
 Presentar la conversación asociada a una reflexión y conectar la UI con los servicios existentes.
 
 Qué hace
-Muestra el acceso, el editor y los comentarios aprobados con estados comprensibles y cercanos.
+Muestra el acceso, el editor y los comentarios publicados con estados comprensibles y cercanos.
 
 Datos que recibe
 El id de la reflexión, la ruta segura de retorno OAuth y un modo visual opcional para integrarse al flujo de lectura.
@@ -18,7 +18,7 @@ la conversación. Google aparece después como mecanismo de publicación, no com
 No se guarda un borrador previo al login: el campo es de solo lectura para evitar prometer persistencia durante OAuth.
 
 Qué no hace
-No define permisos, políticas RLS ni reglas de moderación; esas responsabilidades permanecen en sus servicios.
+No define permisos ni políticas RLS; esas responsabilidades permanecen en sus servicios y migraciones.
 
 Dependencias
 Servicios existentes de autenticación y comentarios.
@@ -100,7 +100,7 @@ const guidanceId = `comment-guidance-${reflectionId}`;
       {
         isReadingMode
           ? 'Inicia sesión con Google para publicar tu comentario.'
-          : 'Tu comentario será revisado antes de publicarse.'
+          : 'Tu comentario aparecerá inmediatamente en la conversación.'
       }
     </p>
     <button
@@ -326,7 +326,7 @@ const guidanceId = `comment-guidance-${reflectionId}`;
         }
         submitButton?.classList.remove('hidden');
         if (isReadingMode && guidance instanceof HTMLElement)
-          guidance.textContent = 'Tu comentario será revisado antes de publicarse.';
+          guidance.textContent = 'Tu comentario aparecerá inmediatamente en la conversación.';
         if (auth instanceof HTMLElement && textarea instanceof HTMLTextAreaElement) {
           if (isReadingMode) {
             // La identidad acompaña el campo sin desplazar la invitación; Google deja de ocupar este lugar tras OAuth.
@@ -390,7 +390,8 @@ const guidanceId = `comment-guidance-${reflectionId}`;
       try {
         await createComment(reflectionId, textarea.value);
         textarea.value = '';
-        notify('Gracias. Tu comentario fue enviado y será revisado antes de publicarse.');
+        await load();
+        notify('Gracias por compartir. Tu comentario ya forma parte de la conversación.');
         trackEvent('comment_submit_success', {
           reflection_slug: root.dataset.reflectionSlug || '',
           authenticated: true,

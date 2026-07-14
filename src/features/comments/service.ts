@@ -24,7 +24,7 @@ export async function createComment(reflectionId: number, content: string) {
     user_name: String(metadata.full_name ?? metadata.name ?? auth.user.email ?? 'Lector'),
     user_avatar: typeof metadata.avatar_url === 'string' ? metadata.avatar_url : null,
     content: content.trim(),
-    is_approved: false,
+    is_approved: true,
   };
   const { data, error } = await client().from('comments').insert(payload).select().single();
   if (error) throw error;
