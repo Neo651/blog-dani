@@ -30,11 +30,12 @@ Autor: Daniel Montesinos
 export interface Props {
   reflectionId: number;
   reflectionSlug?: string;
-  presentation?: 'compact' | 'editorial';
+  presentation?: 'compact' | 'closing' | 'editorial';
 }
 
 const { reflectionId, reflectionSlug = '', presentation = 'compact' } = Astro.props;
 const isEditorial = presentation === 'editorial';
+const isClosing = presentation === 'closing';
 ---
 
 <div
@@ -55,6 +56,25 @@ const isEditorial = presentation === 'editorial';
           aria-pressed="false"
         >
           <span data-like-icon aria-hidden="true" class="text-xl leading-none text-amber-700 dark:text-amber-400">
+            ♡
+          </span>
+          <span data-like-action>Me gustó esta reflexión</span>
+        </button>
+        <p data-like-label class="text-sm text-stone-500 dark:text-stone-400" aria-live="polite">
+          Cargando conexiones…
+        </p>
+      </div>
+    ) : isClosing ? (
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <button
+          type="button"
+          data-like-button
+          disabled
+          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 px-4 py-2.5 text-sm font-semibold text-stone-800 transition duration-200 hover:border-amber-500 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-amber-700 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/12 dark:text-stone-100 dark:hover:border-amber-700 dark:hover:text-white"
+          aria-label="Me gustó esta reflexión"
+          aria-pressed="false"
+        >
+          <span data-like-icon aria-hidden="true" class="text-lg leading-none text-amber-700 dark:text-amber-400">
             ♡
           </span>
           <span data-like-action>Me gustó esta reflexión</span>
@@ -118,9 +138,13 @@ const isEditorial = presentation === 'editorial';
         action.textContent = liked ? 'Te gustó esta reflexión' : 'Me gustó esta reflexión';
       if (label instanceof HTMLElement) {
         label.textContent =
-          state.count === 1
-            ? '1 persona conectó con esta reflexión'
-            : `${state.count} personas conectaron con esta reflexión`;
+          root.dataset.likePresentation === 'closing'
+            ? state.count === 1
+              ? '1 persona conectó'
+              : `${state.count} conectaron`
+            : state.count === 1
+              ? '1 persona conectó con esta reflexión'
+              : `${state.count} personas conectaron con esta reflexión`;
       }
       if (count instanceof HTMLElement) count.textContent = '';
       button.setAttribute('aria-pressed', String(liked));

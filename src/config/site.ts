@@ -6,7 +6,7 @@ export const siteConfig = {
     shortName: 'Daniel',
     siteUrl: 'https://danielmontesinos.com',
     email: 'jmontesinosmata@gmail.com',
-    tagline: 'Piensa mejor. Vive mejor.',
+    tagline: 'Piensa con claridad, Decide con sentido.',
     description: 'Reflexiones para pensar con claridad, crecer con propósito y vivir mejor.',
   },
   navigation: [
@@ -17,9 +17,8 @@ export const siteConfig = {
   ],
   hero: {
     eyebrow: 'Un espacio para detenerte y pensar',
-    title: 'Piensa mejor.\nVive mejor.',
-    description:
-      'Ideas honestas y prácticas para mirar la vida con más claridad, crecer con propósito y tomar mejores decisiones.',
+    title: 'Piensa con claridad,\nDecide con sentido.',
+    description: 'Una reflexión, en el momento adecuado, puede cambiar la manera como ves la vida.',
     cta: { label: 'Comienza a leer', href: '#reflexion-destacada' },
     aboutCta: { label: 'Conóceme', href: '/sobre-mi' },
   },

@@ -26,8 +26,7 @@ Autor: Daniel Montesinos
 ====================================================
 */
 
-import AboutSection from '~/components/about/AboutSection.astro';
-import PersonalBrandStory from '~/components/about/PersonalBrandStory.astro';
+import Image from '~/components/common/Image.astro';
 import SocialSection from '~/components/social/SocialSection.astro';
 import { getImage } from 'astro:assets';
 import { siteConfig } from '~/config/site';
@@ -92,11 +91,6 @@ const personStructuredDataJson = JSON.stringify(personStructuredData).replace(/<
           >
             {siteConfig.personalBrand.title}
           </h1>
-          <p
-            class="mt-6 max-w-2xl text-pretty text-lg leading-8 text-stone-600 dark:text-stone-300 sm:text-xl sm:leading-9"
-          >
-            {siteConfig.personalBrand.introduction}
-          </p>
         </div>
 
         <nav
@@ -120,8 +114,70 @@ const personStructuredDataJson = JSON.stringify(personStructuredData).replace(/<
       </div>
     </header>
 
-    <AboutSection about={siteConfig.about} variant="profile" />
-    <PersonalBrandStory personalBrand={siteConfig.personalBrand} />
+    <section
+      class="relative overflow-hidden border-y border-stone-200/80 bg-stone-50/70 px-5 py-16 dark:border-white/[0.07] dark:bg-white/[0.025] sm:px-6 sm:py-20 lg:py-24"
+      aria-label="Presentación personal"
+    >
+      <div
+        class="pointer-events-none absolute -right-40 top-20 h-80 w-80 rounded-full bg-amber-100/60 blur-3xl dark:bg-amber-950/15"
+        aria-hidden="true"
+      >
+      </div>
+      <div class="relative mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20">
+        <div
+          class="overflow-hidden rounded-[2rem] bg-stone-200 shadow-[0_28px_80px_-42px_rgba(28,25,23,0.5)] dark:bg-stone-800"
+        >
+          <Image
+            src={siteConfig.about.image}
+            alt={siteConfig.about.imageAlt}
+            width={720}
+            height={900}
+            widths={[420, 720, 960]}
+            sizes="(max-width: 1023px) 100vw, 38vw"
+            format="webp"
+            loading="eager"
+            fetchpriority="high"
+            class="aspect-[4/5] h-full w-full object-cover object-top"
+          />
+        </div>
+
+        <div class="max-w-3xl text-lg leading-8 text-stone-600 dark:text-stone-300 sm:text-xl sm:leading-9">
+          <p class="text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+            No tengo todas las respuestas.
+          </p>
+          <div class="mt-8 space-y-6">
+            <p>
+              Soy una persona que cuestiona, aprende y busca mejorar cada día. Escribir me ayuda a entender mejor lo que
+              vivo, a ordenar mis ideas y a tomar decisiones con más claridad.
+            </p>
+            <p>
+              Creo que las mejores decisiones nacen de una mente tranquila, de hábitos consistentes y de la valentía de
+              cuestionarnos incluso cuando resulta incómodo.
+            </p>
+            <p>
+              Este blog es una colección de ideas, experiencias y reflexiones que, antes que nada, me ayudan a construir
+              la vida que quiero vivir. Escribirlas es mi forma de recordarlas, ponerlas a prueba y seguir aprendiendo.
+            </p>
+            <p>
+              Las comparto porque creo que una buena idea, en el momento adecuado, puede cambiar la forma en que vemos
+              un problema, una relación o incluso nuestra propia vida.
+            </p>
+            <p>
+              No pretendo decirte cómo vivir. Solo quiero ofrecerte un lugar donde detenerte unos minutos, pensar con
+              calma y, quizá, descubrir una perspectiva que te acompañe cuando más la necesites.
+            </p>
+            <p>
+              Si una sola reflexión logra ayudarte a pensar mejor, tomar una mejor decisión o vivir con un poco más de
+              intención, entonces todo este proyecto habrá valido la pena.
+            </p>
+          </div>
+          <p class="mt-10 text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+            Bienvenido.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <SocialSection social={siteConfig.social} variant="profile" />
 
     <section class="border-t border-stone-200 px-5 py-16 text-center dark:border-white/[0.08] sm:px-6 sm:py-20">

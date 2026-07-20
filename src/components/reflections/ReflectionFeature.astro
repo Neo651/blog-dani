@@ -19,8 +19,8 @@ Dependencias
 LikeButton, ShareActions, tipo Reflection, configuración pública y utilidades editoriales.
 
 Decisión de compartir
-La acción ocupa una esquina reservada de la cabecera visual, separada del texto editorial. Así puede descubrirse antes
-de abrir el artículo sin competir con el título ni alterar la continuidad entre contenido, reacción y comentarios.
+La acción acompaña al like en el cierre editorial. Así permanece disponible sin interrumpir la portada ni crear una
+segunda franja antes de la conversación.
 
 Autor: Daniel Montesinos
 ====================================================
@@ -71,16 +71,7 @@ const showQuoteAttribution =
     />
     <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-stone-950/45 to-stone-950/20"></div>
     <div class="relative flex min-h-[520px] flex-col justify-between p-7 text-white sm:min-h-[620px] sm:p-12 lg:p-16">
-      <div class="flex items-start justify-between gap-6">
-        <p class="pt-3 text-xs font-semibold uppercase tracking-[0.28em] text-white/75">{brand.name}</p>
-        <ShareActions
-          shareKey={`featured-${reflection.id}`}
-          title={reflection.title}
-          quote={reflection.quote}
-          author={brand.name}
-          url={shareUrl}
-        />
-      </div>
+      <p class="pt-3 text-xs font-semibold uppercase tracking-[0.28em] text-white/75">{brand.name}</p>
       <div class="max-w-4xl">
         <p class="text-sm font-medium text-white/75">{formatReflectionDate(reflection.published_at)}</p>
         <blockquote
@@ -120,8 +111,17 @@ const showQuoteAttribution =
         }
       </div>
       <!-- La línea funciona como una pausa breve, no como una ruptura entre lectura y respuesta. -->
-      <div class="mt-6 border-t border-stone-200 pt-5 dark:border-stone-800 sm:mt-7 sm:pt-6">
-        <LikeButton reflectionId={reflection.id} reflectionSlug={reflection.slug} />
+      <div
+        class="mt-6 flex flex-col gap-3 border-t border-stone-200 pt-4 dark:border-stone-800 sm:mt-7 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:pt-5"
+      >
+        <LikeButton reflectionId={reflection.id} reflectionSlug={reflection.slug} presentation="closing" />
+        <ShareActions
+          shareKey={`featured-${reflection.id}`}
+          title={reflection.title}
+          quote={reflection.quote}
+          author={brand.name}
+          url={shareUrl}
+        />
       </div>
     </div>
   </div>

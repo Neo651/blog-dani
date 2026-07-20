@@ -109,7 +109,7 @@ Orden visual:
 1. Eyebrow:
    “UN ESPACIO PARA DETENERTE Y PENSAR”
 2. Título:
-   “Piensa mejor. Vive mejor.”
+   “Piensa con claridad, Decide con sentido.”
 3. Descripción breve.
 4. CTA principal:
    “Comienza a leer”.

@@ -90,7 +90,14 @@ const previousGridClass =
               </h2>
             </div>
             <ReflectionFeature reflection={latest} brand={siteConfig.brand} headingLevel="h2" />
-            <CommentsSection reflectionId={latest.id} reflectionSlug={latest.slug} returnTo="/" />
+            <CommentsSection
+              reflectionId={latest.id}
+              reflectionSlug={latest.slug}
+              returnTo="/"
+              mode="home"
+              previewLimit={3}
+              conversationHref={`/reflexiones/${latest.slug}#conversacion`}
+            />
           </section>
         ) : (
           <section class="mx-auto mb-24 max-w-3xl rounded-3xl border border-stone-200 p-10 text-center dark:border-stone-800">

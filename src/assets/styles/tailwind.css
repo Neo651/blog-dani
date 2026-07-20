@@ -138,8 +138,8 @@ html {
  * La regla se limita a la Landing y ajusta únicamente composición: no invade el componente ni su lógica.
  */
 .reading-conversation-flow > [data-comments-root] {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0;
 }
 
 /*
@@ -148,13 +148,13 @@ html {
  */
 .reading-prose {
   color: rgb(68 64 60);
-  font-size: clamp(1.0625rem, 0.98rem + 0.3vw, 1.25rem);
-  line-height: 1.85;
+  font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+  line-height: 1.75;
   letter-spacing: -0.008em;
 }
 
 .reading-prose p + p {
-  margin-top: 1.15em;
+  margin-top: 1em;
 }
 
 .dark .reading-prose {
@@ -163,8 +163,8 @@ html {
 
 @media (min-width: 640px) {
   .reading-conversation-flow > [data-comments-root] {
-    margin-top: 2rem;
-    padding-top: 2rem;
+    margin-top: 1rem;
+    padding-top: 0;
   }
 }
 

@@ -19,8 +19,8 @@ Qué no debe hacer
 No implementa persistencia propia, no consulta Supabase y no destaca métricas de popularidad.
 
 Decisión de flujo
-El like aparece primero porque responde a la emoción de la lectura. Compartir ocupa después una fila completa para que
-ninguna acción desaparezca por compresión en desktop y para conservar el mismo orden mental en todos los breakpoints.
+El like aparece primero porque responde a la emoción de la lectura. En pantallas amplias, compartir se integra en la
+misma franja para acortar el cierre; en móvil conserva una segunda línea y el mismo orden mental.
 
 Autor: Daniel Montesinos
 ====================================================
@@ -43,17 +43,12 @@ const { reflectionId, reflectionSlug, canonicalUrl, title, quote, author } = Ast
 
 <aside
   aria-label="Acciones de la reflexión"
-  class="mx-auto max-w-[42rem] border-t border-stone-200 pt-5 dark:border-white/[0.08] sm:pt-6"
+  class="mx-auto flex max-w-[42rem] flex-col gap-3 border-t border-stone-200 pt-4 dark:border-white/[0.08] sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:pt-5"
 >
-  <LikeButton reflectionId={reflectionId} reflectionSlug={reflectionSlug} presentation="editorial" />
-  <div class="mt-5 border-t border-stone-200/70 pt-5 dark:border-white/[0.06]">
-    <ShareActions
-      shareKey={`reading-${reflectionId}`}
-      title={title}
-      quote={quote}
-      author={author}
-      url={canonicalUrl}
-      variant="reading"
-    />
+  <div class="min-w-0 flex-1">
+    <LikeButton reflectionId={reflectionId} reflectionSlug={reflectionSlug} presentation="closing" />
+  </div>
+  <div class="shrink-0">
+    <ShareActions shareKey={`reading-${reflectionId}`} title={title} quote={quote} author={author} url={canonicalUrl} />
   </div>
 </aside>

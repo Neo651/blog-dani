@@ -35,11 +35,15 @@ export interface Props {
   reflectionId: number;
   reflectionSlug?: string;
   returnTo: string;
-  mode?: 'default' | 'reading';
+  mode?: 'default' | 'home' | 'reading';
+  previewLimit?: number;
+  conversationHref?: string;
 }
 
-const { reflectionId, reflectionSlug = '', returnTo, mode = 'default' } = Astro.props;
+const { reflectionId, reflectionSlug = '', returnTo, mode = 'default', previewLimit, conversationHref } = Astro.props;
 const isReadingMode = mode === 'reading';
+const isHomeMode = mode === 'home';
+const isEditorialMode = mode === 'reading' || mode === 'home';
 const textareaId = `comment-${reflectionId}`;
 const guidanceId = `comment-guidance-${reflectionId}`;
 ---
@@ -51,80 +55,107 @@ const guidanceId = `comment-guidance-${reflectionId}`;
   data-reflection-slug={reflectionSlug}
   data-return-to={returnTo}
   data-mode={mode}
+  data-preview-limit={previewLimit}
   class:list={[
-    'mx-auto px-1',
-    isReadingMode
-      ? 'mt-4 max-w-[42rem] scroll-mt-24 pt-4 sm:mt-5 sm:px-0 sm:pt-5'
-      : 'mt-14 max-w-3xl border-t border-stone-200 pt-10 dark:border-white/[0.07] sm:px-6',
+    'mx-auto',
+    isHomeMode
+      ? 'w-full max-w-none'
+      : isReadingMode
+        ? 'mt-3 max-w-[42rem] scroll-mt-24 border-t border-stone-200/70 px-1 pt-5 dark:border-white/[0.06] sm:mt-4 sm:px-0 sm:pt-6'
+        : 'mt-14 max-w-3xl border-t border-stone-200 px-1 pt-10 dark:border-white/[0.07] sm:px-6',
   ]}
 >
-  <p class="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 dark:text-stone-400">
-    La conversación continúa
-  </p>
-  <h2 class="mt-3 text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
-    ¿Qué idea se quedó contigo?
-  </h2>
-  <p class="mt-3 text-stone-500 dark:text-stone-400">
-    {
-      isReadingMode
-        ? 'Comparte una reflexión o una pregunta.'
-        : 'No hace falta tener una respuesta perfecta. Comparte una pregunta, una experiencia o una perspectiva distinta.'
-    }
-  </p>
-
-  {!isReadingMode && <div data-comments-auth class="mt-6" />}
-  <form data-comment-form class:list={[isReadingMode ? 'mt-5' : 'mt-6 hidden']}>
-    <label
-      for={textareaId}
-      class:list={[isReadingMode ? 'mb-2 block text-sm font-medium text-stone-700 dark:text-stone-300' : 'sr-only']}
-    >
-      Tu reflexión
-    </label>
-    <textarea
-      id={textareaId}
-      data-comment-content
-      required
-      maxlength="1000"
-      rows="4"
-      readonly={isReadingMode}
-      aria-disabled={isReadingMode ? 'true' : undefined}
-      aria-describedby={guidanceId}
-      placeholder={isReadingMode ? 'Escribe qué idea se quedó contigo…' : 'Escribe con calma…'}
-      class="min-h-32 w-full resize-y rounded-2xl border border-stone-300 bg-white/70 p-4 leading-7 shadow-inner shadow-stone-100 transition duration-200 placeholder:text-stone-400 hover:border-stone-400 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-600/20 dark:border-white/10 dark:bg-white/[0.025] dark:shadow-none dark:hover:border-white/20 dark:focus:border-amber-500"
-    ></textarea>
-    <p
-      id={guidanceId}
-      data-comment-guidance
-      class:list={[isReadingMode ? 'mt-2 text-sm leading-6 text-stone-500 dark:text-stone-400' : 'hidden']}
-    >
-      {
-        isReadingMode
-          ? 'Inicia sesión con Google para publicar tu comentario.'
-          : 'Tu comentario aparecerá inmediatamente en la conversación.'
-      }
+  <div
+    class:list={[
+      isHomeMode
+        ? 'mx-auto max-w-3xl border-t border-stone-200/70 px-1 pt-4 dark:border-white/[0.06] sm:px-0 sm:pt-5'
+        : 'contents',
+    ]}
+  >
+    <p class="text-xs font-semibold uppercase tracking-[0.24em] text-stone-500 dark:text-stone-400">
+      La conversación continúa
     </p>
-    <button
-      data-comment-submit
-      type="submit"
+    <h2 class="mt-3 text-2xl font-semibold tracking-tight text-stone-950 dark:text-stone-50 sm:text-3xl">
+      ¿Qué idea se quedó contigo?
+    </h2>
+    {!isEditorialMode && <p class="mt-3 text-stone-500 dark:text-stone-400">Comparte una reflexión o una pregunta.</p>}
+
+    <div
       class:list={[
-        isReadingMode
-          ? 'mt-3 min-h-11 rounded-full bg-stone-950 px-5 py-2.5 font-semibold text-white transition duration-200 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 disabled:cursor-wait disabled:opacity-60 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white'
-          : 'mt-3 rounded-full bg-stone-950 px-5 py-3 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 disabled:cursor-wait disabled:opacity-60 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white',
-        isReadingMode && 'hidden',
+        isEditorialMode
+          ? 'mt-5 rounded-2xl border border-stone-200/70 bg-stone-100/40 p-4 dark:border-white/[0.07] dark:bg-white/[0.02] sm:p-5'
+          : 'contents',
       ]}
     >
-      Publicar comentario
-    </button>
-  </form>
-  {isReadingMode && <div data-comments-auth class="mt-3" />}
-  <p data-comments-message role="status" aria-live="polite" class="mt-4 hidden rounded-xl p-3 text-sm"></p>
-  <div
-    data-comments-list
-    class:list={['min-h-6', isReadingMode ? 'mt-7' : 'mt-8 space-y-5']}
-    aria-live="polite"
-    aria-busy="true"
-  >
-    <p class="text-sm text-stone-500 dark:text-stone-400">Cargando comentarios…</p>
+      {!isEditorialMode && <div data-comments-auth class="mt-6" />}
+      <form data-comment-form class:list={[isEditorialMode ? '' : 'mt-6 hidden']}>
+        <label for={textareaId} class="sr-only">Escribe tu comentario</label>
+        <textarea
+          id={textareaId}
+          data-comment-content
+          required
+          maxlength="1000"
+          rows="3"
+          readonly={isEditorialMode}
+          aria-disabled={isEditorialMode ? 'true' : undefined}
+          aria-describedby={guidanceId}
+          placeholder="Escribe con calma…"
+          class="min-h-36 w-full resize-none overflow-y-hidden rounded-2xl border border-stone-300 bg-white/80 p-4 leading-7 shadow-inner shadow-stone-100 transition duration-200 placeholder:text-stone-400 hover:border-stone-400 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-600/20 dark:border-white/10 dark:bg-stone-950/35 dark:shadow-none dark:hover:border-white/20 dark:focus:border-amber-500"
+        ></textarea>
+        <p
+          id={guidanceId}
+          data-comment-guidance
+          class:list={[isEditorialMode ? 'mt-2 text-sm leading-6 text-stone-500 dark:text-stone-400' : 'hidden']}
+        >
+          {
+            isEditorialMode
+              ? 'Inicia sesión con Google para publicar tu comentario.'
+              : 'Tu comentario aparecerá inmediatamente en la conversación.'
+          }
+        </p>
+        <button
+          data-comment-submit
+          type="submit"
+          class:list={[
+            isEditorialMode
+              ? 'mt-3 min-h-11 rounded-full bg-stone-950 px-5 py-2.5 font-semibold text-white transition duration-200 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 disabled:cursor-wait disabled:opacity-60 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white'
+              : 'mt-3 rounded-full bg-stone-950 px-5 py-3 font-semibold text-white transition duration-300 hover:-translate-y-0.5 hover:bg-stone-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-950 disabled:cursor-wait disabled:opacity-60 dark:bg-stone-50 dark:text-stone-950 dark:hover:bg-white',
+            isEditorialMode && 'hidden',
+          ]}
+        >
+          Publicar comentario
+        </button>
+      </form>
+      {isEditorialMode && <div data-comments-auth class="mt-3" />}
+      <p data-comments-message role="status" aria-live="polite" class="mt-3 hidden rounded-lg p-2.5 text-sm"></p>
+    </div>
+    <p
+      data-comments-heading
+      class:list={[
+        'hidden text-xs font-semibold uppercase tracking-[0.18em] text-stone-500 dark:text-stone-400',
+        isEditorialMode ? 'mt-6' : 'mt-8',
+      ]}
+    >
+    </p>
+    <div
+      data-comments-list
+      class:list={['min-h-6', isEditorialMode ? 'mt-4 space-y-3' : 'mt-4 space-y-5']}
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <p class="text-sm text-stone-500 dark:text-stone-400">Cargando comentarios…</p>
+    </div>
+    {
+      conversationHref && (
+        <a
+          data-comments-all-link
+          href={conversationHref}
+          class="mt-4 hidden min-h-11 items-center text-sm font-semibold text-stone-700 underline decoration-stone-300 underline-offset-4 transition hover:text-stone-950 focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700 dark:text-stone-300 dark:decoration-stone-700 dark:hover:text-white"
+        >
+          Ver toda la conversación
+        </a>
+      )
+    }
   </div>
 </section>
 
@@ -155,14 +186,19 @@ const guidanceId = `comment-guidance-${reflectionId}`;
     root.dataset.initialized = 'true';
     const reflectionId = Number(root.dataset.reflectionId);
     const returnTo = root.dataset.returnTo || '/';
+    const previewLimit = Number(root.dataset.previewLimit) || undefined;
     const auth = root.querySelector('[data-comments-auth]');
     const form = root.querySelector('[data-comment-form]');
     const textarea = root.querySelector('[data-comment-content]');
     const guidance = root.querySelector('[data-comment-guidance]');
     const submitButton = root.querySelector('[data-comment-submit]');
     const list = root.querySelector('[data-comments-list]');
+    const commentsHeading = root.querySelector('[data-comments-heading]');
+    const allCommentsLink = root.querySelector('[data-comments-all-link]');
     const message = root.querySelector('[data-comments-message]');
     const isReadingMode = root.dataset.mode === 'reading';
+    const isHomeMode = root.dataset.mode === 'home';
+    const isEditorialMode = isReadingMode || isHomeMode;
     const sourceLocation = isReadingMode ? 'reading_conversation' : 'landing_conversation';
     let userId = '';
     let isAdmin = false;
@@ -171,7 +207,7 @@ const guidanceId = `comment-guidance-${reflectionId}`;
     const notify = (text: string, error = false) => {
       if (!(message instanceof HTMLElement)) return;
       message.textContent = text;
-      message.className = `mt-4 rounded-xl border p-3 text-sm ${
+      message.className = `mt-3 rounded-lg border px-3 py-2 text-sm ${
         error
           ? 'border-red-200 bg-red-50 text-red-800 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-200'
           : 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200'
@@ -185,18 +221,31 @@ const guidanceId = `comment-guidance-${reflectionId}`;
         const comments = await withInterfaceTimeout(getApprovedComments(reflectionId), 8000);
         list.replaceChildren();
         if (!comments.length) {
+          commentsHeading?.classList.add('hidden');
           const empty = document.createElement('p');
-          empty.className = isReadingMode ? 'text-sm leading-6 text-stone-500 dark:text-stone-400' : 'text-gray-500';
-          empty.textContent = isReadingMode
+          allCommentsLink?.classList.add('hidden');
+          empty.className = isEditorialMode ? 'text-sm leading-6 text-stone-500 dark:text-stone-400' : 'text-gray-500';
+          empty.textContent = isEditorialMode
             ? 'Todavía nadie ha iniciado la conversación. Tu reflexión podría ser la primera.'
             : 'Todavía no hay respuestas. Si algo resonó contigo, puedes iniciar la conversación.';
           list.append(empty);
           return;
         }
-        comments.forEach((comment: Comment) => {
+        if (commentsHeading instanceof HTMLElement && !isHomeMode) {
+          commentsHeading.textContent =
+            comments.length === 1 ? '1 idea compartida' : `${comments.length} ideas compartidas`;
+          commentsHeading.classList.remove('hidden');
+        }
+        if (allCommentsLink instanceof HTMLAnchorElement) {
+          allCommentsLink.textContent = `Ver toda la conversación (${comments.length})`;
+          allCommentsLink.classList.remove('hidden');
+          allCommentsLink.classList.add('inline-flex');
+        }
+        const visibleComments = previewLimit ? comments.slice(-previewLimit) : comments;
+        visibleComments.forEach((comment: Comment) => {
           const article = document.createElement('article');
-          article.className = isReadingMode
-            ? 'border-t border-stone-200 py-5 first:border-t-0 first:pt-0 dark:border-white/[0.08]'
+          article.className = isEditorialMode
+            ? 'border-b border-stone-200/70 py-4 first:pt-0 last:border-b-0 last:pb-0 dark:border-white/[0.07]'
             : 'rounded-2xl border border-gray-200 p-5 dark:border-gray-800';
           const header = document.createElement('div');
           header.className = 'flex items-center gap-3';
@@ -204,15 +253,20 @@ const guidanceId = `comment-guidance-${reflectionId}`;
             const avatar = document.createElement('img');
             avatar.src = comment.user_avatar;
             avatar.alt = '';
-            avatar.className = 'h-10 w-10 rounded-full object-cover';
+            avatar.className = isEditorialMode
+              ? 'h-9 w-9 rounded-full object-cover'
+              : 'h-10 w-10 rounded-full object-cover';
             header.append(avatar);
           }
           const identity = document.createElement('div');
+          identity.className = 'min-w-0';
           const name = document.createElement('p');
-          name.className = 'font-semibold';
+          name.className = isEditorialMode
+            ? 'break-words text-sm font-semibold text-stone-900 dark:text-stone-100'
+            : 'break-words font-semibold';
           name.textContent = comment.user_name;
           const date = document.createElement('time');
-          date.className = 'text-sm text-gray-500';
+          date.className = isEditorialMode ? 'text-xs text-stone-500 dark:text-stone-400' : 'text-sm text-gray-500';
           date.dateTime = comment.created_at;
           date.textContent = new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium' }).format(
             new Date(comment.created_at)
@@ -220,25 +274,27 @@ const guidanceId = `comment-guidance-${reflectionId}`;
           identity.append(name, date);
           header.append(identity);
           const content = document.createElement('p');
-          content.className = isReadingMode
-            ? 'mt-3 whitespace-pre-wrap leading-7 text-stone-700 dark:text-stone-300'
-            : 'mt-4 whitespace-pre-wrap text-gray-700 dark:text-gray-300';
+          content.className = isEditorialMode
+            ? 'mt-3 break-words whitespace-pre-wrap leading-7 text-stone-800 dark:text-stone-200'
+            : 'mt-4 break-words whitespace-pre-wrap text-gray-700 dark:text-gray-300';
           content.textContent = comment.content;
           article.append(header, content);
 
           if (comment.user_id === userId || isAdmin) {
             const actions = document.createElement('div');
-            actions.className = isReadingMode ? 'mt-3 flex gap-2 text-sm' : 'mt-4 flex gap-4 text-sm';
+            actions.className = isEditorialMode ? 'mt-3 flex gap-2 text-sm' : 'mt-4 flex gap-4 text-sm';
             const edit = document.createElement('button');
             edit.type = 'button';
             edit.textContent = 'Editar';
+            edit.setAttribute('aria-label', `Editar comentario de ${comment.user_name}`);
             const remove = document.createElement('button');
             remove.type = 'button';
             remove.textContent = 'Eliminar';
-            edit.className = isReadingMode
+            remove.setAttribute('aria-label', `Eliminar comentario de ${comment.user_name}`);
+            edit.className = isEditorialMode
               ? 'min-h-11 rounded-lg px-3 text-stone-600 hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700 dark:text-stone-300 dark:hover:bg-white/[0.06]'
               : '';
-            remove.className = isReadingMode
+            remove.className = isEditorialMode
               ? 'min-h-11 rounded-lg px-3 text-red-700 hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 dark:text-red-300 dark:hover:bg-red-950/30'
               : 'text-red-700';
             edit.classList.toggle('hidden', comment.user_id !== userId);
@@ -267,6 +323,8 @@ const guidanceId = `comment-guidance-${reflectionId}`;
           list.append(article);
         });
       } catch {
+        commentsHeading?.classList.add('hidden');
+        allCommentsLink?.classList.add('hidden');
         list.replaceChildren();
         const failure = document.createElement('p');
         failure.className = 'text-sm text-stone-600 dark:text-stone-300';
@@ -288,7 +346,7 @@ const guidanceId = `comment-guidance-${reflectionId}`;
       auth.replaceChildren();
       const login = document.createElement('button');
       login.type = 'button';
-      login.className = isReadingMode
+      login.className = isEditorialMode
         ? 'min-h-11 rounded-full border border-stone-300 px-5 py-2.5 font-semibold text-stone-800 transition duration-200 hover:border-stone-400 hover:bg-stone-50 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-amber-700 disabled:cursor-wait disabled:opacity-60 dark:border-white/15 dark:text-stone-100 dark:hover:border-white/25 dark:hover:bg-white/[0.04]'
         : 'rounded-full border border-gray-300 px-5 py-3 font-semibold dark:border-gray-700';
       login.textContent = 'Continuar con Google';
@@ -325,10 +383,10 @@ const guidanceId = `comment-guidance-${reflectionId}`;
           textarea.removeAttribute('aria-disabled');
         }
         submitButton?.classList.remove('hidden');
-        if (isReadingMode && guidance instanceof HTMLElement)
+        if (isEditorialMode && guidance instanceof HTMLElement)
           guidance.textContent = 'Tu comentario aparecerá inmediatamente en la conversación.';
         if (auth instanceof HTMLElement && textarea instanceof HTMLTextAreaElement) {
-          if (isReadingMode) {
+          if (isEditorialMode) {
             // La identidad acompaña el campo sin desplazar la invitación; Google deja de ocupar este lugar tras OAuth.
             textarea.before(auth);
             auth.className = 'mb-2 text-sm text-stone-500 dark:text-stone-400';
@@ -368,6 +426,16 @@ const guidanceId = `comment-guidance-${reflectionId}`;
       }
     });
 
+    const resizeTextarea = () => {
+      if (!(textarea instanceof HTMLTextAreaElement)) return;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 384)}px`;
+      textarea.classList.toggle('overflow-y-auto', textarea.scrollHeight > 384);
+      textarea.classList.toggle('overflow-y-hidden', textarea.scrollHeight <= 384);
+    };
+
+    textarea?.addEventListener('input', resizeTextarea);
+
     // El fragmento conserva el contexto tras OAuth y devuelve el foco al punto donde el lector quería participar.
     if (isReadingMode && window.location.hash === '#conversacion' && textarea instanceof HTMLTextAreaElement) {
       window.requestAnimationFrame(() => textarea.focus({ preventScroll: true }));
@@ -390,6 +458,7 @@ const guidanceId = `comment-guidance-${reflectionId}`;
       try {
         await createComment(reflectionId, textarea.value);
         textarea.value = '';
+        resizeTextarea();
         await load();
         notify('Gracias por compartir. Tu comentario ya forma parte de la conversación.');
         trackEvent('comment_submit_success', {
